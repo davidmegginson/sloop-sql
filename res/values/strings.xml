@@ -3,5 +3,7 @@
 
     <string name="hello">Hello World, MainActivity!</string>
     <string name="app_name">SloopSQL</string>
+	<string name="hint_query">Type SQL query here</string>
+	<string name="label_execute">Run query</string>
 
 </resources>
