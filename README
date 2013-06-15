@@ -1,0 +1,18 @@
+SloopSQL - free SQL tool for Android
+
+SloopSQL will be a free SQL tool for Android, allowing viewing and querying
+SQL data from any accessible Android data provider.
+
+Currently, this is in the very earliest stages of development, and doesn't do
+much.
+
+This app is also an experiment, to see if mobile devices are mature enough to
+serve as a software-development platform.  I'm creating SloopSQL entirely on
+Android devices, using the AIDE development environment.  No laptop or desktop
+computer will touch this application during its development cycle, at least 
+until more contributors are involved.
+
+David Megginson
+2013-06-15
+Ottawa, Ontario, CANADA
+
