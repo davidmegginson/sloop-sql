@@ -6,9 +6,14 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.EditText;
 
-public class MainActivity extends Activity
+/**
+ Activity for executing SQL queries.
+ */
+public class QueryActivity extends Activity
 {
-    /** Called when the activity is first created. */
+    /** 
+	 Called when the activity is first created.
+	 */
     @Override
     public void onCreate(Bundle savedInstanceState)
 	{
@@ -17,7 +22,12 @@ public class MainActivity extends Activity
     }
 
 	/**
-	  Event: execute a SQL query.
+	 Event: execute a SQL query.
+	 
+	 Respond to a button press to execute the query in the query field and 
+	 show the results below.
+	 
+	 @param view The button that triggered the event.
 	 */
 	public void doExecuteQuery(View view)
 	{
