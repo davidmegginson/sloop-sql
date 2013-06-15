@@ -1,9 +1,8 @@
 package com.megginson.sloopsql;
 
-import android.app.*;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
 
 public class MainActivity extends Activity
 {
