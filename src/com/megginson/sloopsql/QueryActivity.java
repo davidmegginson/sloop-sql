@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.graphics.Color;
 
 /**
  Activity for executing SQL queries.
@@ -59,6 +60,7 @@ public class QueryActivity extends Activity
 			for (int i = 0; i < cursor.getColumnCount(); i++)
 			{
 				TextView header = new TextView(this);
+				header.setBackgroundColor(Color.GRAY);
 				header.setText(cursor.getColumnName(i));
 				headers.addView(header);
 			}
