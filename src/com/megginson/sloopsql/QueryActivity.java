@@ -45,17 +45,31 @@ public class QueryActivity extends Activity
 		TextView resultsView = (TextView)findViewById(R.id.text_message);
 
 	 	SQLiteDatabase db = mDatabase.getWritableDatabase();
-		
+
 		try
 		{
 			String queryText = queryView.getText().toString();
 			Cursor cursor = db.rawQuery(queryText, null);
 			resultsView.setText("Returned " + cursor.getCount() + " rows");
-			
+
 			tableLayout.removeAllViews();
-			while (cursor.moveToNext()) {
+			
+			// set the headers
+			TableRow headers = new TableRow(this);
+			for (int i = 0; i < cursor.getColumnCount(); i++)
+			{
+				TextView header = new TextView(this);
+				header.setText(cursor.getColumnName(i));
+				headers.addView(header);
+			}
+			tableLayout.addView(headers);
+			
+			// fill in the contents
+			while (cursor.moveToNext())
+			{
 				TableRow row = new TableRow(this);
-				for (int i = 0; i < cursor.getColumnCount(); i++) {
+				for (int i = 0; i < cursor.getColumnCount(); i++)
+				{
 					TextView cell = new TextView(this);
 					cell.setText(cursor.getString(i));
 					row.addView(cell);
