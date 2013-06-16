@@ -8,6 +8,8 @@ import android.widget.EditText;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 
 /**
  Activity for executing SQL queries.
@@ -24,7 +26,7 @@ public class QueryActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
 	{
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.query);
 		mDatabase = new DatabaseHandler(this);
     }
 
@@ -39,7 +41,8 @@ public class QueryActivity extends Activity
 	public void doExecuteQuery(View view)
 	{
 		EditText queryView = (EditText)findViewById(R.id.input_query);
-		TextView resultsView = (TextView)findViewById(R.id.text_results);
+		TableLayout tableLayout = (TableLayout)findViewById(R.id.table_results);
+		TextView resultsView = (TextView)findViewById(R.id.text_message);
 
 	 	SQLiteDatabase db = mDatabase.getWritableDatabase();
 		
@@ -48,8 +51,19 @@ public class QueryActivity extends Activity
 			String queryText = queryView.getText().toString();
 			Cursor cursor = db.rawQuery(queryText, null);
 			resultsView.setText("Returned " + cursor.getCount() + " rows");
+			
+			tableLayout.removeAllViews();
+			while (cursor.moveToNext()) {
+				TableRow row = new TableRow(this);
+				for (int i = 0; i < cursor.getColumnCount(); i++) {
+					TextView cell = new TextView(this);
+					cell.setText(cursor.getString(i));
+					row.addView(cell);
+				}
+				tableLayout.addView(row);
+			}
 		}
-		catch (SQLException e)
+		catch (Exception e)
 		{
 			resultsView.setText(e.getMessage());
 		}
