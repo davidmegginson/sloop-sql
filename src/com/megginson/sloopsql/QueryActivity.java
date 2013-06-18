@@ -13,7 +13,7 @@ import android.widget.TableRow;
 import android.graphics.Color;
 
 /**
- Activity for executing SQL queries.
+ * Activity for executing SQL queries.
  */
 public class QueryActivity extends Activity
 {
@@ -21,7 +21,7 @@ public class QueryActivity extends Activity
  	private DatabaseHandler mDatabase;
 
     /** 
-	 Called when the activity is first created.
+	 * Called when the activity is first created.
 	 */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -30,14 +30,14 @@ public class QueryActivity extends Activity
         setContentView(R.layout.query);
 		mDatabase = new DatabaseHandler(this);
     }
-
+	
 	/**
-	 Event: execute a SQL query.
-
-	 Respond to a button press to execute the query in the query field and 
-	 show the results below.
-
-	 @param view The button that triggered the event.
+	 * Event: execute a SQL query.
+	 *
+	 * Respond to a button press to execute the query in the query field and 
+	 * show the results below.
+	 *
+	 * @param view The button that triggered the event.
 	 */
 	public void doExecuteQuery(View view)
 	{
@@ -54,7 +54,7 @@ public class QueryActivity extends Activity
 			resultsView.setText("Returned " + cursor.getCount() + " rows");
 
 			tableLayout.removeAllViews();
-			
+
 			// set the headers
 			TableRow headers = new TableRow(this);
 			for (int i = 0; i < cursor.getColumnCount(); i++)
@@ -65,14 +65,14 @@ public class QueryActivity extends Activity
 				headers.addView(header);
 			}
 			tableLayout.addView(headers);
-			
+
 			// fill in the contents
 			while (cursor.moveToNext())
 			{
 				TableRow row = new TableRow(this);
 				for (int i = 0; i < cursor.getColumnCount(); i++)
 				{
-					TextView cell = new TextView(this);
+					TextView cell = (TextView)getLayoutInflater().inflate(R.layout.table_cell, null);
 					cell.setText(cursor.getString(i));
 					row.addView(cell);
 				}
