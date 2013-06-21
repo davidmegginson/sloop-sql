@@ -26,12 +26,32 @@
 			android:onClick="doExecuteQuery" />
 
 	</LinearLayout>
-	
-	<ListView
-		android:id="@+id/list_results"
+
+	<HorizontalScrollView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_weight="1" />
+		android:layout_weight="1">
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical">
+
+			<LinearLayout
+				android:id="@+id/layout_header"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal" />
+
+			<ListView
+				android:id="@+id/list_results"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="1" />
+
+		</LinearLayout>
+
+	</HorizontalScrollView>
 
 	<TextView
 		android:id="@+id/text_message"
