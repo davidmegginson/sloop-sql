@@ -59,8 +59,7 @@ public class QueryActivity extends Activity
 			TableRow headers = new TableRow(this);
 			for (int i = 0; i < cursor.getColumnCount(); i++)
 			{
-				TextView header = new TextView(this);
-				header.setBackgroundColor(Color.GRAY);
+				TextView header = (TextView)inflate(R.layout.table_header);
 				header.setText(cursor.getColumnName(i));
 				headers.addView(header);
 			}
@@ -72,7 +71,7 @@ public class QueryActivity extends Activity
 				TableRow row = new TableRow(this);
 				for (int i = 0; i < cursor.getColumnCount(); i++)
 				{
-					TextView cell = (TextView)getLayoutInflater().inflate(R.layout.table_cell, null);
+					TextView cell = (TextView)inflate(R.layout.table_cell);
 					cell.setText(cursor.getString(i));
 					row.addView(cell);
 				}
@@ -87,5 +86,10 @@ public class QueryActivity extends Activity
 		{
 			db.close();
 		}
+	}
+	
+	private View inflate(int id)
+	{
+		return getLayoutInflater().inflate(id, null);
 	}
 }
