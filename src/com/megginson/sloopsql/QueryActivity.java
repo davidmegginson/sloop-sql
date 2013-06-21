@@ -11,6 +11,7 @@ import android.database.SQLException;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.graphics.Color;
+import android.widget.ListView;
 
 /**
  * Activity for executing SQL queries.
@@ -42,8 +43,8 @@ public class QueryActivity extends Activity
 	public void doExecuteQuery(View view)
 	{
 		EditText queryView = (EditText)findViewById(R.id.input_query);
-		TableLayout tableLayout = (TableLayout)findViewById(R.id.table_results);
-		TextView resultsView = (TextView)findViewById(R.id.text_message);
+		ListView resultsView = (ListView)findViewById(R.id.list_results);
+		TextView messageView = (TextView)findViewById(R.id.text_message);
 
 	 	SQLiteDatabase db = mDatabase.getWritableDatabase();
 
@@ -51,36 +52,12 @@ public class QueryActivity extends Activity
 		{
 			String queryText = queryView.getText().toString();
 			Cursor cursor = db.rawQuery(queryText, null);
-			resultsView.setText("Returned " + cursor.getCount() + " rows");
-
-			tableLayout.removeAllViews();
-
-			// set the headers
-			TableRow headers = new TableRow(this);
-			for (int i = 0; i < cursor.getColumnCount(); i++)
-			{
-				TextView header = (TextView)inflate(R.layout.table_header);
-				header.setText(cursor.getColumnName(i));
-				headers.addView(header);
-			}
-			tableLayout.addView(headers);
-
-			// fill in the contents
-			while (cursor.moveToNext())
-			{
-				TableRow row = new TableRow(this);
-				for (int i = 0; i < cursor.getColumnCount(); i++)
-				{
-					TextView cell = (TextView)inflate(R.layout.table_cell);
-					cell.setText(cursor.getString(i));
-					row.addView(cell);
-				}
-				tableLayout.addView(row);
-			}
+			messageView.setText("Returned " + cursor.getCount() + " rows");
+			resultsView.setAdapter(new QueryResultAdapter(cursor));
 		}
 		catch (Exception e)
 		{
-			resultsView.setText(e.getMessage());
+			messageView.setText(e.getMessage());
 		}
 		finally
 		{
@@ -88,8 +65,4 @@ public class QueryActivity extends Activity
 		}
 	}
 	
-	private View inflate(int id)
-	{
-		return getLayoutInflater().inflate(id, null);
-	}
 }

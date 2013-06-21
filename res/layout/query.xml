@@ -27,8 +27,8 @@
 
 	</LinearLayout>
 	
-	<TableLayout
-		android:id="@+id/table_results"
+	<ListView
+		android:id="@+id/list_results"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_weight="1" />
