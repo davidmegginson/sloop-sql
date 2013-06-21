@@ -33,7 +33,7 @@ public class QueryResultAdapter extends BaseAdapter implements ListAdapter
 		mCursor.moveToPosition(position);
 		for (int i = 0; i < mCursor.getColumnCount(); i++)
 		{
-			TextView cell = (TextView)inflate(parent, R.layout.table_cell);
+			TextView cell = (TextView)Util.inflate(parent, R.layout.table_cell);
 			cell.setText(mCursor.getString(i));
 			layout.addView(cell);
 		}
@@ -50,12 +50,6 @@ public class QueryResultAdapter extends BaseAdapter implements ListAdapter
 	public int getCount()
 	{
 		return mCursor.getCount();
-	}
-
-	private View inflate(ViewGroup parent, int id)
-	{
-		LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-		return inflater.inflate(id, null);
 	}
 
 }

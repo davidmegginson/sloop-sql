@@ -60,7 +60,7 @@ public class QueryActivity extends Activity
 			{
 				for (int i = 0; i < cursor.getColumnCount(); i++)
 				{
-					TextView header = new TextView(this);
+					TextView header = (TextView)Util.inflate(headerView, R.layout.table_header);
 					header.setText(cursor.getColumnName(i));
 					headerView.addView(header);
 				}	
