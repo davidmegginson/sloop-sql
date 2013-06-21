@@ -5,15 +5,15 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.ArrayList;
-import java.util.List;
-import android.widget.ListAdapter;
-import android.widget.ArrayAdapter;
+import android.content.SharedPreferences;
 
 /**
  * Activity for executing SQL queries.
@@ -22,8 +22,8 @@ public class QueryActivity extends Activity
 {
 
  	private DatabaseHandler mDatabase;
-	
-	private List<String> mQueryHistory = new ArrayList<String>();
+
+	private Set<String> mQueryHistory = new HashSet<String>();
 
     /** 
 	 * Called when the activity is first created.
@@ -34,9 +34,26 @@ public class QueryActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.query);
 		mDatabase = new DatabaseHandler(this);
-		update_history(null);
+		
+		SharedPreferences prefs = getPreferences(0);
+		mQueryHistory = prefs.getStringSet("queryHistory", mQueryHistory);
+		
+		update_query_history(null);
     }
 	
+	/**
+	 * Save preferences when the activity stops.
+	 */
+	public void onStop()
+	{
+		super.onStop();
+		
+		SharedPreferences prefs = getPreferences(0);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putStringSet("queryHistory", mQueryHistory);
+		editor.commit();
+	}
+
 	/**
 	 * Event: execute a SQL query.
 	 *
@@ -58,8 +75,8 @@ public class QueryActivity extends Activity
 		{
 			String queryText = queryView.getText().toString();
 			Cursor cursor = db.rawQuery(queryText, null);
-			update_history(queryText);
-			
+			update_query_history(queryText);
+
 			headerView.removeAllViews();
 			if (cursor.moveToNext())
 			{
@@ -70,7 +87,7 @@ public class QueryActivity extends Activity
 					headerView.addView(header);
 				}	
 			}
-			
+
 			messageView.setText("Returned " + cursor.getCount() + " rows");
 			resultsView.setAdapter(new QueryResultAdapter(cursor));
 		}
@@ -83,17 +100,26 @@ public class QueryActivity extends Activity
 			db.close();
 		}
 	}
-	
-	private void update_history(String entry)
+
+	/**
+	 * Update the query history for autocomplete.
+	 *
+	 * If the parameter is not null, add it to the history first; otherwise,
+	 * just set the history from the mQueryHistory list.
+	 */
+	private void update_query_history(String entry)
 	{
 		AutoCompleteTextView queryView = (AutoCompleteTextView)findViewById(R.id.input_query);
 		queryView.setThreshold(1);
-		
-		if (entry != null && !mQueryHistory.contains(entry)) {
+
+		if (entry != null)
+		{
 			mQueryHistory.add(entry);
 		}
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mQueryHistory);
+		ArrayAdapter<String> adapter = 
+			new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, 
+			new ArrayList<String>(mQueryHistory));
 		queryView.setAdapter(adapter);
-		
+
 	}
 }
