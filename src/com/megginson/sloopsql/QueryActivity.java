@@ -24,6 +24,9 @@ public class QueryActivity extends Activity
  	private DatabaseHandler mDatabase;
 
 	private Set<String> mQueryHistory = new HashSet<String>();
+	
+	private AutoCompleteTextView mQueryView;
+	
 
     /** 
 	 * Called when the activity is first created.
@@ -37,6 +40,8 @@ public class QueryActivity extends Activity
 		
 		SharedPreferences prefs = getPreferences(0);
 		mQueryHistory = prefs.getStringSet("queryHistory", mQueryHistory);
+		
+		mQueryView = (AutoCompleteTextView)findViewById(R.id.input_query);
 		
 		update_query_history(null);
     }
@@ -53,6 +58,19 @@ public class QueryActivity extends Activity
 		editor.putStringSet("queryHistory", mQueryHistory);
 		editor.commit();
 	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle bundle)
+	{
+		bundle.putString("queryText", mQueryView.getText().toString());
+	}
+	
+	@Override
+	public void onRestoreInstanceState(Bundle bundle)
+	{
+		mQueryView.setText(bundle.getString("queryText"));
+		doExecuteQuery(mQueryView);
+	}
 
 	/**
 	 * Event: execute a SQL query.
@@ -64,7 +82,6 @@ public class QueryActivity extends Activity
 	 */
 	public void doExecuteQuery(View view)
 	{
-		AutoCompleteTextView queryView = (AutoCompleteTextView)findViewById(R.id.input_query);
 		LinearLayout headerView  = (LinearLayout)findViewById(R.id.layout_header);
 		ListView resultsView = (ListView)findViewById(R.id.list_results);
 		TextView messageView = (TextView)findViewById(R.id.text_message);
@@ -73,7 +90,11 @@ public class QueryActivity extends Activity
 
 		try
 		{
-			String queryText = queryView.getText().toString();
+			String queryText = mQueryView.getText().toString();
+			if (queryText == null || queryText.length() == 0)
+			{
+				return;
+			}
 			Cursor cursor = db.rawQuery(queryText, null);
 			update_query_history(queryText);
 
@@ -109,8 +130,7 @@ public class QueryActivity extends Activity
 	 */
 	private void update_query_history(String entry)
 	{
-		AutoCompleteTextView queryView = (AutoCompleteTextView)findViewById(R.id.input_query);
-		queryView.setThreshold(1);
+		mQueryView.setThreshold(1);
 
 		if (entry != null)
 		{
@@ -119,7 +139,7 @@ public class QueryActivity extends Activity
 		ArrayAdapter<String> adapter = 
 			new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, 
 			new ArrayList<String>(mQueryHistory));
-		queryView.setAdapter(adapter);
+		mQueryView.setAdapter(adapter);
 
 	}
 }
