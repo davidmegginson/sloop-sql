@@ -1,9 +1,7 @@
 package com.megginson.sloopsql;
 
 import android.app.Activity;
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -17,6 +15,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import android.os.AsyncTask;
 
 /**
  * Activity for executing SQL queries.
@@ -24,14 +23,16 @@ import java.util.Set;
 public class QueryActivity extends Activity
 {
 
+	public final static String QUERY_HISTORY_PROPERTY = "queryHistory";
+
+	public final static String QUERY_TEXT_PROPERTY = "queryText";
+
+
  	private DatabaseHandler mDatabase;
 
 	private Set<String> mQueryHistory = new HashSet<String>();
 
 	private AutoCompleteTextView mQueryView;
-	
-	private Context mContext;
-	
 
     /** 
 	 * Called when the activity is first created.
@@ -41,13 +42,11 @@ public class QueryActivity extends Activity
 	{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.query);
-		
-		mContext = this;
-		
+
 		mDatabase = new DatabaseHandler(this);
-		
+
 		SharedPreferences prefs = getPreferences(0);
-		mQueryHistory = prefs.getStringSet("queryHistory", mQueryHistory);
+		mQueryHistory = prefs.getStringSet(QUERY_HISTORY_PROPERTY, mQueryHistory);
 
 		mQueryView = (AutoCompleteTextView)findViewById(R.id.input_query);
 
@@ -57,26 +56,27 @@ public class QueryActivity extends Activity
 	/**
 	 * Save preferences when the activity stops.
 	 */
+	@Override
 	public void onStop()
 	{
 		super.onStop();
 
 		SharedPreferences prefs = getPreferences(0);
 		SharedPreferences.Editor editor = prefs.edit();
-		editor.putStringSet("queryHistory", mQueryHistory);
+		editor.putStringSet(QUERY_HISTORY_PROPERTY, mQueryHistory);
 		editor.commit();
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle bundle)
 	{
-		bundle.putString("queryText", mQueryView.getText().toString());
+		bundle.putString(QUERY_TEXT_PROPERTY, mQueryView.getText().toString());
 	}
 
 	@Override
 	public void onRestoreInstanceState(Bundle bundle)
 	{
-		mQueryView.setText(bundle.getString("queryText"));
+		mQueryView.setText(bundle.getString(QUERY_TEXT_PROPERTY));
 		doExecuteQuery(mQueryView);
 	}
 
@@ -90,44 +90,12 @@ public class QueryActivity extends Activity
 	 */
 	public void doExecuteQuery(View view)
 	{
-		LinearLayout headerView  = (LinearLayout)findViewById(R.id.layout_header);
-		ListView resultsView = (ListView)findViewById(R.id.list_results);
-		TextView messageView = (TextView)findViewById(R.id.text_message);
+		String queryText = mQueryView.getText().toString();
 
-	 	SQLiteDatabase db = mDatabase.getWritableDatabase();
-
-		try
+		if (queryText != null && queryText.length() > 0)
 		{
-			String queryText = mQueryView.getText().toString();
-			if (queryText == null || queryText.length() == 0)
-			{
-				return;
-			}
-			
-			Cursor cursor = db.rawQuery(queryText, null);
+			new QueryTask().execute(queryText);
 			update_query_history(queryText);
-
-			headerView.removeAllViews();
-			if (cursor.moveToNext())
-			{
-				for (int i = 0; i < cursor.getColumnCount(); i++)
-				{
-					TextView header = (TextView)Util.inflate(headerView, R.layout.table_header);
-					header.setText(cursor.getColumnName(i));
-					headerView.addView(header);
-				}	
-			}
-
-			messageView.setText("Returned " + cursor.getCount() + " rows");
-			resultsView.setAdapter(new QueryResultAdapter(cursor));
-		}
-		catch (Exception e)
-		{
-			messageView.setText(e.getMessage());
-		}
-		finally
-		{
-			db.close();
 		}
 	}
 
@@ -152,22 +120,30 @@ public class QueryActivity extends Activity
 
 	}
 
-	class QueryLoaderClient implements LoaderManager.LoaderCallbacks<Cursor>
+	/**
+	 * Task for running a database query in the background.
+	 */
+	private class QueryTask extends AsyncTask<String, Integer, Cursor>
 	{
 
 		@Override
-		public Loader<Cursor> onCreateLoader(int id, Bundle args)
+		protected Cursor doInBackground(String ... queries)
 		{
-			return new QueryLoader(mContext, mDatabase.getWritableDatabase(), args.getString("queryString"));
+			Cursor cursor = null;
+			SQLiteDatabase database = mDatabase.getWritableDatabase();
+			for (int i = 0; i < queries.length; i++)
+			{
+				cursor = database.rawQuery(queries[i], null);
+			} 
+			return cursor;
 		}
-		
+
 		@Override
-		public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
+		protected void onPostExecute(Cursor cursor)
 		{
 			LinearLayout headerView  = (LinearLayout)findViewById(R.id.layout_header);
 			ListView resultsView = (ListView)findViewById(R.id.list_results);
 			TextView messageView = (TextView)findViewById(R.id.text_message);
-			
 			headerView.removeAllViews();
 			if (cursor.moveToNext())
 			{
@@ -181,14 +157,8 @@ public class QueryActivity extends Activity
 
 			messageView.setText("Returned " + cursor.getCount() + " rows");
 			resultsView.setAdapter(new QueryResultAdapter(cursor));
-			
 		}
-		
-		@Override
-		public void onLoaderReset(Loader<Cursor> loader)
-		{
-			
-		}
-		
+
 	}
+
 }
