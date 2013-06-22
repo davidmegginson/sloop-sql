@@ -162,8 +162,25 @@ public class QueryActivity extends Activity
 		}
 		
 		@Override
-		public void onLoadFinished(Loader<Cursor> loader, Cursor result)
+		public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
 		{
+			LinearLayout headerView  = (LinearLayout)findViewById(R.id.layout_header);
+			ListView resultsView = (ListView)findViewById(R.id.list_results);
+			TextView messageView = (TextView)findViewById(R.id.text_message);
+			
+			headerView.removeAllViews();
+			if (cursor.moveToNext())
+			{
+				for (int i = 0; i < cursor.getColumnCount(); i++)
+				{
+					TextView header = (TextView)Util.inflate(headerView, R.layout.table_header);
+					header.setText(cursor.getColumnName(i));
+					headerView.addView(header);
+				}	
+			}
+
+			messageView.setText("Returned " + cursor.getCount() + " rows");
+			resultsView.setAdapter(new QueryResultAdapter(cursor));
 			
 		}
 		
