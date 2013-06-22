@@ -1,6 +1,10 @@
 package com.megginson.sloopsql;
 
 import android.app.Activity;
+import android.app.LoaderManager;
+import android.content.Context;
+import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -10,10 +14,9 @@ import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.ArrayList;
-import android.content.SharedPreferences;
 
 /**
  * Activity for executing SQL queries.
@@ -24,8 +27,10 @@ public class QueryActivity extends Activity
  	private DatabaseHandler mDatabase;
 
 	private Set<String> mQueryHistory = new HashSet<String>();
-	
+
 	private AutoCompleteTextView mQueryView;
+	
+	private Context mContext;
 	
 
     /** 
@@ -36,35 +41,38 @@ public class QueryActivity extends Activity
 	{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.query);
+		
+		mContext = this;
+		
 		mDatabase = new DatabaseHandler(this);
 		
 		SharedPreferences prefs = getPreferences(0);
 		mQueryHistory = prefs.getStringSet("queryHistory", mQueryHistory);
-		
+
 		mQueryView = (AutoCompleteTextView)findViewById(R.id.input_query);
-		
+
 		update_query_history(null);
     }
-	
+
 	/**
 	 * Save preferences when the activity stops.
 	 */
 	public void onStop()
 	{
 		super.onStop();
-		
+
 		SharedPreferences prefs = getPreferences(0);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putStringSet("queryHistory", mQueryHistory);
 		editor.commit();
 	}
-	
+
 	@Override
 	public void onSaveInstanceState(Bundle bundle)
 	{
 		bundle.putString("queryText", mQueryView.getText().toString());
 	}
-	
+
 	@Override
 	public void onRestoreInstanceState(Bundle bundle)
 	{
@@ -95,6 +103,7 @@ public class QueryActivity extends Activity
 			{
 				return;
 			}
+			
 			Cursor cursor = db.rawQuery(queryText, null);
 			update_query_history(queryText);
 
@@ -138,8 +147,31 @@ public class QueryActivity extends Activity
 		}
 		ArrayAdapter<String> adapter = 
 			new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, 
-			new ArrayList<String>(mQueryHistory));
+									 new ArrayList<String>(mQueryHistory));
 		mQueryView.setAdapter(adapter);
 
+	}
+
+	class QueryLoaderClient implements LoaderManager.LoaderCallbacks<Cursor>
+	{
+
+		@Override
+		public Loader<Cursor> onCreateLoader(int id, Bundle args)
+		{
+			return new QueryLoader(mContext, mDatabase.getWritableDatabase(), args.getString("queryString"));
+		}
+		
+		@Override
+		public void onLoadFinished(Loader<Cursor> loader, Cursor result)
+		{
+			
+		}
+		
+		@Override
+		public void onLoaderReset(Loader<Cursor> loader)
+		{
+			
+		}
+		
 	}
 }
