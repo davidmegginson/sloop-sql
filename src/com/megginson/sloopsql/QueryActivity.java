@@ -17,6 +17,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import org.apache.http.message.HeaderGroup;
 
 /**
  * Activity for executing SQL queries.
@@ -167,7 +168,7 @@ public class QueryActivity extends Activity
 			{
 				for (int i = 0; i < cursor.getColumnCount(); i++)
 				{
-					TextView header = (TextView)Util.inflate(headerView, R.layout.table_header);
+					TextView header = (TextView)Util.inflate(headerView.getContext(), R.layout.table_header);
 					header.setText(cursor.getColumnName(i));
 					headerView.addView(header);
 				}	
