@@ -1,6 +1,8 @@
 package com.megginson.sloopsql;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -26,8 +28,7 @@ public class QueryActivity extends Activity
 
 	public final static String QUERY_TEXT_PROPERTY = "queryText";
 
-
- 	private DatabaseHandler mDatabase;
+ 	private DatabaseHandler mDatabaseHandler;
 
 	private Set<String> mQueryHistory = new HashSet<String>();
 
@@ -37,44 +38,59 @@ public class QueryActivity extends Activity
 	 * Called when the activity is first created.
 	 */
     @Override
-    public void onCreate(Bundle savedInstanceState)
+    protected void onCreate(Bundle savedInstanceState)
 	{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.query);
 
-		mDatabase = new DatabaseHandler(this);
-
-		SharedPreferences prefs = getPreferences(0);
-		mQueryHistory = prefs.getStringSet(QUERY_HISTORY_PROPERTY, mQueryHistory);
+		mDatabaseHandler = new DatabaseHandler(this);
 
 		mQueryView = (AutoCompleteTextView)findViewById(R.id.input_query);
-
-		update_query_history(null);
     }
 
 	/**
-	 * Save preferences when the activity stops.
+	 * Load preferences when the activity resumes.
 	 */
 	@Override
-	public void onStop()
+	protected void onResume()
 	{
-		super.onStop();
+		super.onResume();
+		SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+		// must copy - return value not safe to modify
+		mQueryHistory = new HashSet<String>(prefs.getStringSet(QUERY_HISTORY_PROPERTY, null));
+		update_query_history(null);
+	}
 
-		SharedPreferences prefs = getPreferences(0);
+	/**
+	 * Save preferences when the activity pauses.
+	 */
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		SharedPreferences prefs = getPreferences(MODE_PRIVATE);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putStringSet(QUERY_HISTORY_PROPERTY, mQueryHistory);
 		editor.commit();
 	}
 
+	/**
+	 * Saved the temporary runtime state
+	 */
 	@Override
-	public void onSaveInstanceState(Bundle bundle)
+	protected void onSaveInstanceState(Bundle bundle)
 	{
+		super.onSaveInstanceState(bundle);
 		bundle.putString(QUERY_TEXT_PROPERTY, mQueryView.getText().toString());
 	}
 
+	/**
+	 * Restore the temporary runtime state
+	 */
 	@Override
-	public void onRestoreInstanceState(Bundle bundle)
+	protected void onRestoreInstanceState(Bundle bundle)
 	{
+		super.onRestoreInstanceState(bundle);
 		mQueryView.setText(bundle.getString(QUERY_TEXT_PROPERTY));
 		doExecuteQuery(mQueryView);
 	}
@@ -106,8 +122,6 @@ public class QueryActivity extends Activity
 	 */
 	private void update_query_history(String entry)
 	{
-		mQueryView.setThreshold(1);
-
 		if (entry != null)
 		{
 			mQueryHistory.add(entry);
@@ -116,7 +130,6 @@ public class QueryActivity extends Activity
 			new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, 
 									 new ArrayList<String>(mQueryHistory));
 		mQueryView.setAdapter(adapter);
-
 	}
 
 	/**
@@ -125,11 +138,14 @@ public class QueryActivity extends Activity
 	private class QueryTask extends AsyncTask<String, Integer, Cursor>
 	{
 
+		/**
+		 * Run the SQL query (called from a background thread)
+		 */
 		@Override
 		protected Cursor doInBackground(String ... queries)
 		{
 			Cursor cursor = null;
-			SQLiteDatabase database = mDatabase.getWritableDatabase();
+			SQLiteDatabase database = mDatabaseHandler.getWritableDatabase();
 			for (int i = 0; i < queries.length; i++)
 			{
 				cursor = database.rawQuery(queries[i], null);
@@ -137,6 +153,9 @@ public class QueryActivity extends Activity
 			return cursor;
 		}
 
+		/**
+		 * Handle the SQL result (called from the main UI thread)
+		 */
 		@Override
 		protected void onPostExecute(Cursor cursor)
 		{
