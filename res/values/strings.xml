@@ -5,5 +5,6 @@
     <string name="app_name">SloopSQL</string>
 	<string name="hint_query">Type SQL query here</string>
 	<string name="label_execute">Run query</string>
-
+	<string name="label_clear_history">Clear history</string>
+	<string name="message_history_cleared">History cleared</string>
 </resources>

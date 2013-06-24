@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
@@ -17,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.megginson.sloopsql.R;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -111,6 +115,25 @@ public class QueryActivity extends Activity
 		mQueryView.setText(bundle.getString(QUERY_TEXT_PROPERTY));
 		doExecuteQuery(mQueryView);
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.query_menu, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+			case R.id.item_clear_history:
+				doClearHistory();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
 
 	/**
 	 * Event: execute a SQL query.
@@ -137,7 +160,14 @@ public class QueryActivity extends Activity
 	{
 		mQueryView.setText("");
 	}
-
+	
+	public void doClearHistory()
+	{
+		mQueryHistory = new HashSet<String>();
+		update_query_history(null);
+		showToast(getString(R.string.message_history_cleared));
+	}
+	
 	/**
 	 * Set up the UI components of the activity.
 	 */
@@ -180,6 +210,11 @@ public class QueryActivity extends Activity
 									 new ArrayList<String>(mQueryHistory));
 		mQueryView.setAdapter(adapter);
 	}
+	
+	private void showToast(String message)
+	{
+		Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+	}
 
 	/**
 	 * Task for running a database query in the background.
@@ -221,7 +256,7 @@ public class QueryActivity extends Activity
 		{
 			if (result.isError())
 			{
-				Toast.makeText(mContext, result.getThrowable().getMessage(), Toast.LENGTH_LONG).show();
+				showToast(result.getThrowable().getMessage());
 				return;
 			}
 			Cursor cursor = result.getResult();
