@@ -1,23 +1,23 @@
 package com.megginson.sloopsql;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import org.apache.http.message.HeaderGroup;
 
 /**
  * Activity for executing SQL queries.
@@ -35,6 +35,8 @@ public class QueryActivity extends Activity
 
 	private AutoCompleteTextView mQueryView;
 
+	private Button mQueryButton;
+
     /** 
 	 * Called when the activity is first created.
 	 */
@@ -46,7 +48,7 @@ public class QueryActivity extends Activity
 
 		mDatabaseHandler = new DatabaseHandler(this);
 
-		mQueryView = (AutoCompleteTextView)findViewById(R.id.input_query);
+		setup_ui();		
     }
 
 	/**
@@ -113,6 +115,31 @@ public class QueryActivity extends Activity
 			new QueryTask().execute(queryText);
 			update_query_history(queryText);
 		}
+	}
+
+	/**
+	 * Set up the UI components of the activity.
+	 */
+	private void setup_ui()
+	{
+		mQueryButton = (Button)findViewById(R.id.button_query);
+
+		mQueryView = (AutoCompleteTextView)findViewById(R.id.input_query);
+		mQueryView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+				@Override
+				public boolean onEditorAction(TextView view, int actionId, KeyEvent event)
+				{
+					if (actionId == EditorInfo.IME_NULL)
+					{
+						mQueryButton.performClick();
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+				}
+			});
 	}
 
 	/**
