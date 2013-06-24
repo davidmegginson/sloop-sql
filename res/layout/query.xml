@@ -10,20 +10,31 @@
 		android:layout_height="wrap_content"
 		android:layout_width="fill_parent"
 		android:orientation="horizontal">
-
-		<AutoCompleteTextView
-			android:id="@+id/input_query"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:hint="@string/hint_query" />
-
+		
 		<Button
 			android:id="@+id/button_query"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/label_execute"
 			android:onClick="doExecuteQuery" />
+
+		<AutoCompleteTextView
+			android:id="@+id/input_query"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingRight="32dp"
+			android:layout_weight="1"
+			android:hint="@string/hint_query" />
+		
+		<ImageButton
+			android:id="@+id/button_clear"
+			android:layout_width="32dp"
+			android:layout_height="match_parent"
+			android:layout_marginLeft="-32dp"
+			android:layout_alignParentTop="true"
+			android:background="@android:color/transparent"
+			android:src="@android:drawable/ic_delete"
+			android:onClick="doClearQuery" />
 
 	</LinearLayout>
 

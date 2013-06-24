@@ -1,4 +1,5 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="@dimen/cell_width"
     android:layout_height="wrap_content"
-	android:padding="@dimen/cell_padding"/>
+	android:padding="@dimen/cell_padding"
+	android:textIsSelectable="true"/>

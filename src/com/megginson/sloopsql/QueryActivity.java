@@ -118,6 +118,14 @@ public class QueryActivity extends Activity
 	}
 
 	/**
+	 * Clear the query text field.
+	 */
+	public void doClearQuery(View view)
+	{
+		mQueryView.setText("");
+	}
+
+	/**
 	 * Set up the UI components of the activity.
 	 */
 	private void setup_ui()
