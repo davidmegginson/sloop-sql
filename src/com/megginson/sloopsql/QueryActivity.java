@@ -1,6 +1,7 @@
 package com.megginson.sloopsql;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,6 +16,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,6 +30,8 @@ public class QueryActivity extends Activity
 	public final static String QUERY_HISTORY_PROPERTY = "queryHistory";
 
 	public final static String QUERY_TEXT_PROPERTY = "queryText";
+
+	private Context mContext;
 
  	private DatabaseHandler mDatabaseHandler;
 
@@ -46,6 +50,8 @@ public class QueryActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.query);
 
+		mContext = this;
+
 		mDatabaseHandler = new DatabaseHandler(this);
 
 		setup_ui();		
@@ -60,7 +66,15 @@ public class QueryActivity extends Activity
 		super.onResume();
 		SharedPreferences prefs = getPreferences(MODE_PRIVATE);
 		// must copy - return value not safe to modify
-		mQueryHistory = new HashSet<String>(prefs.getStringSet(QUERY_HISTORY_PROPERTY, null));
+		Set<String> history = prefs.getStringSet(QUERY_HISTORY_PROPERTY, null);
+		if (history == null)
+		{
+			mQueryHistory = new HashSet<String>();
+		}
+		else
+		{
+			mQueryHistory = new HashSet<String>(history);
+		}
 		update_query_history(null);
 	}
 
@@ -113,7 +127,6 @@ public class QueryActivity extends Activity
 		if (queryText != null && queryText.length() > 0)
 		{
 			new QueryTask().execute(queryText);
-			update_query_history(queryText);
 		}
 	}
 
@@ -171,30 +184,48 @@ public class QueryActivity extends Activity
 	/**
 	 * Task for running a database query in the background.
 	 */
-	private class QueryTask extends AsyncTask<String, Integer, Cursor>
+	private class QueryTask extends AsyncTask<String, Integer, AsyncResult<Cursor>>
 	{
+		
+		private String mQueryText;
 
 		/**
 		 * Run the SQL query (called from a background thread)
 		 */
 		@Override
-		protected Cursor doInBackground(String ... queries)
+		protected AsyncResult<Cursor> doInBackground(String ... queries)
 		{
 			Cursor cursor = null;
 			SQLiteDatabase database = mDatabaseHandler.getWritableDatabase();
-			for (int i = 0; i < queries.length; i++)
+			try
 			{
-				cursor = database.rawQuery(queries[i], null);
-			} 
-			return cursor;
+				for (int i = 0; i < queries.length; i++)
+				{
+					cursor = database.rawQuery(queries[i], null);
+					// save the successful query text
+					mQueryText = queries[i];
+				} 
+				return new AsyncResult<Cursor>(cursor);
+			}
+			catch (Throwable t)
+			{
+				return new AsyncResult<Cursor>(t);
+			}
 		}
 
 		/**
 		 * Handle the SQL result (called from the main UI thread)
 		 */
 		@Override
-		protected void onPostExecute(Cursor cursor)
+		protected void onPostExecute(AsyncResult<Cursor> result)
 		{
+			if (result.isError())
+			{
+				Toast.makeText(mContext, result.getThrowable().getMessage(), Toast.LENGTH_LONG).show();
+				return;
+			}
+			Cursor cursor = result.getResult();
+			update_query_history(mQueryText);
 			LinearLayout headerView  = (LinearLayout)findViewById(R.id.layout_header);
 			ListView resultsView = (ListView)findViewById(R.id.list_results);
 			TextView messageView = (TextView)findViewById(R.id.text_message);
