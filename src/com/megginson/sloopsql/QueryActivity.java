@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -22,15 +23,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.megginson.sloopsql.R;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.io.StringWriter;
 
 /**
  * Activity for executing SQL queries.
@@ -215,12 +212,16 @@ public class QueryActivity extends Activity
 	{
 		try
 		{
-			StringWriter output = new StringWriter();
+			// FIXME - make unique
+			// FIXME - need to clean up old files
+			String filename = "sloopsql-results.csv";
+			Writer output = new OutputStreamWriter(openFileOutput(filename, MODE_WORLD_READABLE));
 			new CSVCursorSerializer(mCursor).serialize(output);
+			output.close();
 
 			Intent sendIntent = new Intent();
 			sendIntent.setAction(Intent.ACTION_SEND);
-			sendIntent.putExtra(Intent.EXTRA_TEXT, output.toString());
+			sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(getFileStreamPath(filename)));
 			sendIntent.setType("text/csv");
 			startActivity(sendIntent);
 		}
