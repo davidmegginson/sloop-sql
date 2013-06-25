@@ -1,6 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     
-    <item
+	<item
+		android:id="@+id/item_share"
+		android:title="@string/label_share"
+		android:icon="@android:drawable/ic_menu_share"
+		android:showAsAction="ifRoom" />
+    
+	<item
         android:id="@+id/item_clear_history"
         android:title="@string/label_clear_history" />
     
