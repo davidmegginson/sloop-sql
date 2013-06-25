@@ -1,6 +1,6 @@
 package com.megginson.sloopsql;
 
-import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,18 +28,22 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 
 /**
  * Activity for executing SQL queries.
  */
-public class QueryActivity extends Activity
+public class QueryFragment extends Fragment
 {
 
 	public final static String QUERY_HISTORY_PROPERTY = "queryHistory";
 
 	public final static String QUERY_TEXT_PROPERTY = "queryText";
 
-	private Context mContext;
+	private String mQueryText;
+	
+	private View mFragmentView;
 
  	private DatabaseHandler mDatabaseHandler;
 
@@ -57,24 +61,30 @@ public class QueryActivity extends Activity
 	 * Called when the activity is first created.
 	 */
     @Override
-    protected void onCreate(Bundle savedInstanceState)
+    public void onCreate(Bundle savedInstanceState)
 	{
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.query);
+		setHasOptionsMenu(true);
 
-		mContext = this;
-
-		mDatabaseHandler = new DatabaseHandler(this);
+		mDatabaseHandler = new DatabaseHandler(getActivity());
 		mDatabase = mDatabaseHandler.getWritableDatabase();
 
-		setup_ui();		
+		mQueryText = savedInstanceState.getString(QUERY_TEXT_PROPERTY);
     }
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container)
+	{
+		mFragmentView = inflater.inflate(R.layout.query, null);
+		setup_ui();
+		return mFragmentView;
+	}
 
 	/**
 	 * Free database resources when we destroy the task.
 	 */
 	@Override
-	protected void onDestroy()
+	public void onDestroy()
 	{
 		super.onDestroy();
 
@@ -99,10 +109,10 @@ public class QueryActivity extends Activity
 	 * Load preferences when the activity resumes.
 	 */
 	@Override
-	protected void onResume()
+	public void onResume()
 	{
 		super.onResume();
-		SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+		SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
 		// must copy - return value not safe to modify
 		Set<String> history = prefs.getStringSet(QUERY_HISTORY_PROPERTY, null);
 		if (history == null)
@@ -114,16 +124,22 @@ public class QueryActivity extends Activity
 			mQueryHistory = new HashSet<String>(history);
 		}
 		update_query_history(null);
+
+		if (mQueryText != null)
+		{
+			mQueryView.setText(mQueryText);
+			doExecuteQuery(mQueryView);
+		}
 	}
 
 	/**
 	 * Save preferences when the activity pauses.
 	 */
 	@Override
-	protected void onPause()
+	public void onPause()
 	{
 		super.onPause();
-		SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+		SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putStringSet(QUERY_HISTORY_PROPERTY, mQueryHistory);
 		editor.commit();
@@ -133,29 +149,16 @@ public class QueryActivity extends Activity
 	 * Saved the temporary runtime state
 	 */
 	@Override
-	protected void onSaveInstanceState(Bundle bundle)
+	public void onSaveInstanceState(Bundle bundle)
 	{
 		super.onSaveInstanceState(bundle);
 		bundle.putString(QUERY_TEXT_PROPERTY, mQueryView.getText().toString());
 	}
 
-	/**
-	 * Restore the temporary runtime state
-	 */
 	@Override
-	protected void onRestoreInstanceState(Bundle bundle)
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
-		super.onRestoreInstanceState(bundle);
-		mQueryView.setText(bundle.getString(QUERY_TEXT_PROPERTY));
-		doExecuteQuery(mQueryView);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.query_menu, menu);
-		return true;
 	}
 
 	@Override
@@ -215,13 +218,13 @@ public class QueryActivity extends Activity
 			// FIXME - make unique
 			// FIXME - need to clean up old files
 			String filename = "sloopsql-results.csv";
-			Writer output = new OutputStreamWriter(openFileOutput(filename, MODE_WORLD_READABLE));
+			Writer output = new OutputStreamWriter(getActivity().openFileOutput(filename, Context.MODE_WORLD_READABLE));
 			new CSVCursorSerializer(mCursor).serialize(output);
 			output.close();
 
 			Intent sendIntent = new Intent();
 			sendIntent.setAction(Intent.ACTION_SEND);
-			sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(getFileStreamPath(filename)));
+			sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(getActivity().getFileStreamPath(filename)));
 			sendIntent.setType("text/csv");
 			startActivity(sendIntent);
 		}
@@ -236,9 +239,9 @@ public class QueryActivity extends Activity
 	 */
 	private void setup_ui()
 	{
-		mQueryButton = (Button)findViewById(R.id.button_query);
+		mQueryButton = (Button)mFragmentView.findViewById(R.id.button_query);
 
-		mQueryView = (AutoCompleteTextView)findViewById(R.id.input_query);
+		mQueryView = (AutoCompleteTextView)mFragmentView.findViewById(R.id.input_query);
 		mQueryView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 				@Override
 				public boolean onEditorAction(TextView view, int actionId, KeyEvent event)
@@ -269,14 +272,14 @@ public class QueryActivity extends Activity
 			mQueryHistory.add(entry);
 		}
 		ArrayAdapter<String> adapter = 
-			new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, 
+			new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, 
 									 new ArrayList<String>(mQueryHistory));
 		mQueryView.setAdapter(adapter);
 	}
 
 	private void show_toast(String message)
 	{
-		Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+		Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
 	}
 
 	private void set_cursor(Cursor cursor)
@@ -340,9 +343,9 @@ public class QueryActivity extends Activity
 
 			update_query_history(mQueryText);
 
-			LinearLayout headerView  = (LinearLayout)findViewById(R.id.layout_header);
-			ListView resultsView = (ListView)findViewById(R.id.list_results);
-			TextView messageView = (TextView)findViewById(R.id.text_message);
+			LinearLayout headerView  = (LinearLayout)mFragmentView.findViewById(R.id.layout_header);
+			ListView resultsView = (ListView)mFragmentView.findViewById(R.id.list_results);
+			TextView messageView = (TextView)mFragmentView.findViewById(R.id.text_message);
 
 			headerView.removeAllViews();
 			if (mCursor.moveToNext())
