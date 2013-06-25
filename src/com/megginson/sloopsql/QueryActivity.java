@@ -38,9 +38,9 @@ public class QueryActivity extends Activity
 	private Context mContext;
 
  	private DatabaseHandler mDatabaseHandler;
-	
+
 	private SQLiteDatabase mDatabase;
-	
+
 	private Cursor mCursor;
 
 	private Set<String> mQueryHistory = new HashSet<String>();
@@ -65,10 +65,15 @@ public class QueryActivity extends Activity
 
 		setup_ui();		
     }
-	
+
+	/**
+	 * Free database resources when we destroy the task.
+	 */
 	@Override
 	protected void onDestroy()
 	{
+		super.onDestroy();
+
 		if (mCursor != null)
 		{
 			mCursor.close();
@@ -78,6 +83,11 @@ public class QueryActivity extends Activity
 		{
 			mDatabase.close();
 			mDatabase = null;
+		}
+		if (mDatabaseHandler != null)
+		{
+			mDatabaseHandler.close();
+			mDatabaseHandler = null;
 		}
 	}
 
@@ -135,18 +145,21 @@ public class QueryActivity extends Activity
 		mQueryView.setText(bundle.getString(QUERY_TEXT_PROPERTY));
 		doExecuteQuery(mQueryView);
 	}
-	
+
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.query_menu, menu);
 		return true;
 	}
-	
+
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
 		// Handle item selection
-		switch (item.getItemId()) {
+		switch (item.getItemId())
+		{
 			case R.id.item_clear_history:
 				doClearHistory();
 				return true;
@@ -180,14 +193,14 @@ public class QueryActivity extends Activity
 	{
 		mQueryView.setText("");
 	}
-	
+
 	public void doClearHistory()
 	{
 		mQueryHistory = new HashSet<String>();
 		update_query_history(null);
 		show_toast(getString(R.string.message_history_cleared));
 	}
-	
+
 	/**
 	 * Set up the UI components of the activity.
 	 */
@@ -230,12 +243,12 @@ public class QueryActivity extends Activity
 									 new ArrayList<String>(mQueryHistory));
 		mQueryView.setAdapter(adapter);
 	}
-	
+
 	private void show_toast(String message)
 	{
 		Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
 	}
-	
+
 	private void set_cursor(Cursor cursor)
 	{
 		if (mCursor != null)
@@ -250,7 +263,7 @@ public class QueryActivity extends Activity
 	 */
 	private class QueryTask extends AsyncTask<String, Integer, AsyncResult<Cursor>>
 	{
-		
+
 		private String mQueryText;
 
 		/**
@@ -287,7 +300,7 @@ public class QueryActivity extends Activity
 				show_toast(result.getThrowable().getMessage());
 				return;
 			}
-			
+
 			// stores in mCursor after closing any old one
 			set_cursor(result.getResult());
 			if (mCursor == null)
@@ -312,7 +325,7 @@ public class QueryActivity extends Activity
 				}	
 			}
 
-			messageView.setText("Returned " + mCursor.getCount() + " rows");
+			messageView.setText(String.format(getString(R.string.message_query_result), mCursor.getCount()));
 			resultsView.setAdapter(new QueryResultAdapter(mCursor));
 		}
 

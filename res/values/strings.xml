@@ -3,6 +3,7 @@
 
     <string name="hello">Welcome to SloopSQL!</string>
     <string name="app_name">SloopSQL</string>
+	<string name="message_query_result">Returned %1$d row(s)</string>
 	<string name="hint_query">Type SQL query here</string>
 	<string name="label_execute">Run query</string>
 	<string name="label_clear_history">Clear history</string>
