@@ -38,6 +38,10 @@ public class QueryActivity extends Activity
 	private Context mContext;
 
  	private DatabaseHandler mDatabaseHandler;
+	
+	private SQLiteDatabase mDatabase;
+	
+	private Cursor mCursor;
 
 	private Set<String> mQueryHistory = new HashSet<String>();
 
@@ -57,9 +61,25 @@ public class QueryActivity extends Activity
 		mContext = this;
 
 		mDatabaseHandler = new DatabaseHandler(this);
+		mDatabase = mDatabaseHandler.getWritableDatabase();
 
 		setup_ui();		
     }
+	
+	@Override
+	protected void onDestroy()
+	{
+		if (mCursor != null)
+		{
+			mCursor.close();
+			mCursor = null;
+		}
+		if (mDatabase != null)
+		{
+			mDatabase.close();
+			mDatabase = null;
+		}
+	}
 
 	/**
 	 * Load preferences when the activity resumes.
@@ -165,7 +185,7 @@ public class QueryActivity extends Activity
 	{
 		mQueryHistory = new HashSet<String>();
 		update_query_history(null);
-		showToast(getString(R.string.message_history_cleared));
+		show_toast(getString(R.string.message_history_cleared));
 	}
 	
 	/**
@@ -211,9 +231,18 @@ public class QueryActivity extends Activity
 		mQueryView.setAdapter(adapter);
 	}
 	
-	private void showToast(String message)
+	private void show_toast(String message)
 	{
 		Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+	}
+	
+	private void set_cursor(Cursor cursor)
+	{
+		if (mCursor != null)
+		{
+			mCursor.close();
+		}
+		mCursor = cursor;
 	}
 
 	/**
@@ -231,12 +260,11 @@ public class QueryActivity extends Activity
 		protected AsyncResult<Cursor> doInBackground(String ... queries)
 		{
 			Cursor cursor = null;
-			SQLiteDatabase database = mDatabaseHandler.getWritableDatabase();
 			try
 			{
 				for (int i = 0; i < queries.length; i++)
 				{
-					cursor = database.rawQuery(queries[i], null);
+					cursor = mDatabase.rawQuery(queries[i], null);
 					// save the successful query text
 					mQueryText = queries[i];
 				} 
@@ -256,27 +284,36 @@ public class QueryActivity extends Activity
 		{
 			if (result.isError())
 			{
-				showToast(result.getThrowable().getMessage());
+				show_toast(result.getThrowable().getMessage());
 				return;
 			}
-			Cursor cursor = result.getResult();
+			
+			// stores in mCursor after closing any old one
+			set_cursor(result.getResult());
+			if (mCursor == null)
+			{
+				return;
+			}
+
 			update_query_history(mQueryText);
+
 			LinearLayout headerView  = (LinearLayout)findViewById(R.id.layout_header);
 			ListView resultsView = (ListView)findViewById(R.id.list_results);
 			TextView messageView = (TextView)findViewById(R.id.text_message);
+
 			headerView.removeAllViews();
-			if (cursor.moveToNext())
+			if (mCursor.moveToNext())
 			{
-				for (int i = 0; i < cursor.getColumnCount(); i++)
+				for (int i = 0; i < mCursor.getColumnCount(); i++)
 				{
 					TextView header = (TextView)Util.inflate(headerView.getContext(), R.layout.table_header);
-					header.setText(cursor.getColumnName(i));
+					header.setText(mCursor.getColumnName(i));
 					headerView.addView(header);
 				}	
 			}
 
-			messageView.setText("Returned " + cursor.getCount() + " rows");
-			resultsView.setAdapter(new QueryResultAdapter(cursor));
+			messageView.setText("Returned " + mCursor.getCount() + " rows");
+			resultsView.setAdapter(new QueryResultAdapter(mCursor));
 		}
 
 	}
