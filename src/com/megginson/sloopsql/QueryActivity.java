@@ -2,6 +2,7 @@ package com.megginson.sloopsql;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -21,9 +22,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.megginson.sloopsql.R;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.io.StringWriter;
 
 /**
  * Activity for executing SQL queries.
@@ -163,6 +170,9 @@ public class QueryActivity extends Activity
 			case R.id.item_clear_history:
 				doClearHistory();
 				return true;
+			case R.id.item_share:
+				doShare();
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -199,6 +209,25 @@ public class QueryActivity extends Activity
 		mQueryHistory = new HashSet<String>();
 		update_query_history(null);
 		show_toast(getString(R.string.message_history_cleared));
+	}
+
+	public void doShare()
+	{
+		try
+		{
+			StringWriter output = new StringWriter();
+			new CSVCursorSerializer(mCursor).serialize(output);
+
+			Intent sendIntent = new Intent();
+			sendIntent.setAction(Intent.ACTION_SEND);
+			sendIntent.putExtra(Intent.EXTRA_TEXT, output.toString());
+			sendIntent.setType("text/csv");
+			startActivity(sendIntent);
+		}
+		catch (Throwable t)
+		{
+			show_toast(t.getMessage());
+		}
 	}
 
 	/**
