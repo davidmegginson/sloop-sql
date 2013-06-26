@@ -64,19 +64,19 @@ public class QueryFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
 	{
         super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
-
-		mDatabaseHandler = new DatabaseHandler(getActivity());
-		mDatabase = mDatabaseHandler.getWritableDatabase();
-
-		mQueryText = savedInstanceState.getString(QUERY_TEXT_PROPERTY);
+//		setHasOptionsMenu(true);
+//
+//		mDatabaseHandler = new DatabaseHandler(getActivity());
+//		mDatabase = mDatabaseHandler.getWritableDatabase();
+//
+//		mQueryText = savedInstanceState.getString(QUERY_TEXT_PROPERTY);
     }
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container)
 	{
-		mFragmentView = inflater.inflate(R.layout.query, null);
-		setup_ui();
+		mFragmentView = inflater.inflate(R.layout.query, container);
+//		setup_ui();
 		return mFragmentView;
 	}
 
@@ -87,22 +87,22 @@ public class QueryFragment extends Fragment
 	public void onDestroy()
 	{
 		super.onDestroy();
-
-		if (mCursor != null)
-		{
-			mCursor.close();
-			mCursor = null;
-		}
-		if (mDatabase != null)
-		{
-			mDatabase.close();
-			mDatabase = null;
-		}
-		if (mDatabaseHandler != null)
-		{
-			mDatabaseHandler.close();
-			mDatabaseHandler = null;
-		}
+//
+//		if (mCursor != null)
+//		{
+//			mCursor.close();
+//			mCursor = null;
+//		}
+//		if (mDatabase != null)
+//		{
+//			mDatabase.close();
+//			mDatabase = null;
+//		}
+//		if (mDatabaseHandler != null)
+//		{
+//			mDatabaseHandler.close();
+//			mDatabaseHandler = null;
+//		}
 	}
 
 	/**
@@ -112,24 +112,24 @@ public class QueryFragment extends Fragment
 	public void onResume()
 	{
 		super.onResume();
-		SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
-		// must copy - return value not safe to modify
-		Set<String> history = prefs.getStringSet(QUERY_HISTORY_PROPERTY, null);
-		if (history == null)
-		{
-			mQueryHistory = new HashSet<String>();
-		}
-		else
-		{
-			mQueryHistory = new HashSet<String>(history);
-		}
-		update_query_history(null);
-
-		if (mQueryText != null)
-		{
-			mQueryView.setText(mQueryText);
-			doExecuteQuery(mQueryView);
-		}
+//		SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+//		// must copy - return value not safe to modify
+//		Set<String> history = prefs.getStringSet(QUERY_HISTORY_PROPERTY, null);
+//		if (history == null)
+//		{
+//			mQueryHistory = new HashSet<String>();
+//		}
+//		else
+//		{
+//			mQueryHistory = new HashSet<String>(history);
+//		}
+//		update_query_history(null);
+//
+//		if (mQueryText != null)
+//		{
+//			mQueryView.setText(mQueryText);
+//			doExecuteQuery(mQueryView);
+//		}
 	}
 
 	/**
@@ -139,10 +139,10 @@ public class QueryFragment extends Fragment
 	public void onPause()
 	{
 		super.onPause();
-		SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = prefs.edit();
-		editor.putStringSet(QUERY_HISTORY_PROPERTY, mQueryHistory);
-		editor.commit();
+//		SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+//		SharedPreferences.Editor editor = prefs.edit();
+//		editor.putStringSet(QUERY_HISTORY_PROPERTY, mQueryHistory);
+//		editor.commit();
 	}
 
 	/**
@@ -152,13 +152,13 @@ public class QueryFragment extends Fragment
 	public void onSaveInstanceState(Bundle bundle)
 	{
 		super.onSaveInstanceState(bundle);
-		bundle.putString(QUERY_TEXT_PROPERTY, mQueryView.getText().toString());
+//		bundle.putString(QUERY_TEXT_PROPERTY, mQueryView.getText().toString());
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
-		inflater.inflate(R.menu.query_menu, menu);
+//		inflater.inflate(R.menu.query_menu, menu);
 	}
 
 	@Override
