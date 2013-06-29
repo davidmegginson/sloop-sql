@@ -16,7 +16,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/label_execute"
-			android:onClick="doExecuteQuery" />
+			/>
 
 		<AutoCompleteTextView
 			android:id="@+id/input_query"
@@ -34,7 +34,7 @@
 			android:layout_alignParentTop="true"
 			android:background="@android:color/transparent"
 			android:src="@android:drawable/ic_delete"
-			android:onClick="doClearQuery" />
+			/>
 
 	</LinearLayout>
 
