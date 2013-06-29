@@ -20,9 +20,10 @@ import android.app.FragmentTransaction;
  */
 public class TabListener implements ActionBar.TabListener
 {
-	private Fragment mFragment;
 	private final Activity mActivity;
+	private final int mParentId;
 	private final String mTag;
+	private Fragment mFragment;
 
 	/** 
 	 * Construct a new tab-content instance.
@@ -31,9 +32,10 @@ public class TabListener implements ActionBar.TabListener
 	 * @param tag  The identifier tag for the fragment
 	 * @param fragmentClass  The fragment's Class, used to instantiate the fragment
 	 */
-	public TabListener(Activity activity, String tag, Fragment fragment)
+	public TabListener(Activity activity, int parentId, String tag, Fragment fragment)
 	{
 		mActivity = activity;
+		mParentId = parentId;
 		mTag = tag;
 		mFragment = fragment;
 	}
@@ -43,7 +45,7 @@ public class TabListener implements ActionBar.TabListener
 	@Override
 	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
 	{
-		ft.replace(android.R.id.content, mFragment, mTag);
+		ft.replace(mParentId, mFragment, mTag);
 		ft.attach(mFragment);
 	}
 
