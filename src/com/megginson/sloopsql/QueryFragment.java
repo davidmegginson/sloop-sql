@@ -74,7 +74,9 @@ public class QueryFragment extends Fragment
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		return inflater.inflate(R.layout.query, container, false);
+		mFragmentView = inflater.inflate(R.layout.query, container, false);
+		setup_ui();
+		return mFragmentView;
 	}
 
 	/**
@@ -84,22 +86,22 @@ public class QueryFragment extends Fragment
 	public void onDestroy()
 	{
 		super.onDestroy();
-//
-//		if (mCursor != null)
-//		{
-//			mCursor.close();
-//			mCursor = null;
-//		}
-//		if (mDatabase != null)
-//		{
-//			mDatabase.close();
-//			mDatabase = null;
-//		}
-//		if (mDatabaseHandler != null)
-//		{
-//			mDatabaseHandler.close();
-//			mDatabaseHandler = null;
-//		}
+
+		if (mCursor != null)
+		{
+			mCursor.close();
+			mCursor = null;
+		}
+		if (mDatabase != null)
+		{
+			mDatabase.close();
+			mDatabase = null;
+		}
+		if (mDatabaseHandler != null)
+		{
+			mDatabaseHandler.close();
+			mDatabaseHandler = null;
+		}
 	}
 
 	/**
