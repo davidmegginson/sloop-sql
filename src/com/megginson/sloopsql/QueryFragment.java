@@ -41,8 +41,6 @@ public class QueryFragment extends Fragment
 
 	public final static String QUERY_TEXT_PROPERTY = "queryText";
 
-	private String mQueryText;
-
 	private View mFragmentView;
 
  	private DatabaseHandler mDatabaseHandler;
@@ -68,11 +66,6 @@ public class QueryFragment extends Fragment
 
 		mDatabaseHandler = new DatabaseHandler(getActivity());
 		mDatabase = mDatabaseHandler.getWritableDatabase();
-
-		if (savedInstanceState != null)
-		{
-			mQueryText = savedInstanceState.getString(QUERY_TEXT_PROPERTY);
-		}
     }
 
 	@Override
@@ -80,11 +73,10 @@ public class QueryFragment extends Fragment
 	{
 		mFragmentView = inflater.inflate(R.layout.query, container, false);
 		setup_ui();
-
-		if (mQueryText != null)
+		
+		if (savedInstanceState != null)
 		{
-			mQueryView.setText(mQueryText);
-			doExecuteQuery(mQueryView);
+			mQueryView.setText(savedInstanceState.getString(QUERY_TEXT_PROPERTY));
 		}
 
 		return mFragmentView;
@@ -122,6 +114,9 @@ public class QueryFragment extends Fragment
 	public void onResume()
 	{
 		super.onResume();
+		
+		do_execute_query();
+		
 		SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
 		// must copy - return value not safe to modify
 		Set<String> history = prefs.getStringSet(QUERY_HISTORY_PROPERTY, null);
@@ -190,8 +185,8 @@ public class QueryFragment extends Fragment
 	 *
 	 * @param view The button that triggered the event.
 	 */
-	public void doExecuteQuery(View view)
-	{
+	public void do_execute_query()
+	{		
 		String queryText = mQueryView.getText().toString();
 
 		if (queryText != null && queryText.length() > 0)
@@ -247,7 +242,7 @@ public class QueryFragment extends Fragment
 		mQueryButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view)
 				{
-					doExecuteQuery(view);
+					do_execute_query();
 				}
 			});
 
