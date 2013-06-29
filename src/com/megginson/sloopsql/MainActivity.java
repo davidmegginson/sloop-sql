@@ -17,6 +17,8 @@ public class MainActivity extends Activity
 {
 
  	private ActionBar mActionBar;
+	
+	private Menu mOptionsMenu;
 
 	private int mQueryCounter = 0;
 
@@ -37,6 +39,8 @@ public class MainActivity extends Activity
 	{
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main_menu, menu);
+		mOptionsMenu = menu;
+		refresh_options_menu();
 		return true;		
 	}
 
@@ -47,7 +51,10 @@ public class MainActivity extends Activity
 		switch (item.getItemId())
 		{
 			case R.id.item_add_query:
-				doAddQueryTab();
+				do_add_query_tab();
+				return true;
+			case R.id.item_close_tab:
+				do_close_current_tab();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -57,7 +64,7 @@ public class MainActivity extends Activity
 	/**
 	 * Add a new query tab
 	 */
-	private void doAddQueryTab()
+	private void do_add_query_tab()
 	{
 		String tag = "query" + mQueryCounter;
 		ActionBar.Tab tab = mActionBar.newTab()
@@ -65,7 +72,36 @@ public class MainActivity extends Activity
 			.setTabListener(new TabListener<QueryFragment>(this, tag, QueryFragment.class));
 		mActionBar.addTab(tab);
 		tab.select();
+		refresh_options_menu();
 		mQueryCounter++;
 	}
 
+	/**
+	* Close the current tab.
+	*/
+	private void do_close_current_tab()
+	{
+		ActionBar.Tab currentTab = mActionBar.getSelectedTab();
+		if (currentTab != null) {
+			mActionBar.removeTab(currentTab);
+		}
+		refresh_options_menu();
+	}
+	
+	/**
+	* Refresh the options menu based on current tab state.
+	*/
+	private void refresh_options_menu()
+	{
+		MenuItem closeTabItem = mOptionsMenu.findItem(R.id.item_close_tab);
+		if (closeTabItem != null)
+		{
+			if (mActionBar.getTabCount() > 0) {
+				closeTabItem.setVisible(true);
+			} else {
+				closeTabItem.setVisible(false);
+			}
+			invalidateOptionsMenu();
+		}
+	}
 }
