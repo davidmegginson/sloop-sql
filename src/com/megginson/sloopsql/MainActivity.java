@@ -2,12 +2,11 @@ package com.megginson.sloopsql;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
-import com.megginson.sloopsql.R;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
+import com.megginson.sloopsql.R;
 
 /**
  * Main container activity for the UI.
@@ -17,32 +16,56 @@ import android.view.MenuInflater;
 public class MainActivity extends Activity
 {
 
+ 	private ActionBar mActionBar;
+
+	private int mQueryCounter = 0;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		
-		final ActionBar actionBar = getActionBar();
+
+		mActionBar = getActionBar();
 
 		// Specify that tabs should be displayed in the action bar.
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-		// Add 3 tabs, specifying the tab's text and TabListener
-		for (int i = 0; i < 3; i++) {
-			actionBar.addTab(
-                actionBar.newTab()
-				.setText("Query " + (i + 1))
-				.setTabListener(new TabListener<QueryFragment>(this, "query" + i, QueryFragment.class)));
-		}
+		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main_menu, menu);
 		return true;		
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		// Handle item selection
+		switch (item.getItemId())
+		{
+			case R.id.item_add_query:
+				doAddQueryTab();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	/**
+	 * Add a new query tab
+	 */
+	private void doAddQueryTab()
+	{
+		String tag = "query" + mQueryCounter;
+		ActionBar.Tab tab = mActionBar.newTab()
+			.setText("Query " + (mQueryCounter + 1))
+			.setTabListener(new TabListener<QueryFragment>(this, tag, QueryFragment.class));
+		mActionBar.addTab(tab);
+		tab.select();
+		mQueryCounter++;
 	}
 
 }
