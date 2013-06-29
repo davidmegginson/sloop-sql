@@ -69,7 +69,7 @@ public class MainActivity extends Activity
 		String tag = "query" + mQueryCounter;
 		ActionBar.Tab tab = mActionBar.newTab()
 			.setText("Query " + (mQueryCounter + 1))
-			.setTabListener(new TabListener<QueryFragment>(this, tag, QueryFragment.class));
+			.setTabListener(new TabListener(this, tag, new QueryFragment()));
 		mActionBar.addTab(tab);
 		tab.select();
 		refresh_options_menu();

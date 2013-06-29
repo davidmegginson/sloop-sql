@@ -18,12 +18,11 @@ import android.app.FragmentTransaction;
  * Adapted from the example at 
  * http://developer.android.com/guide/topics/ui/actionbar.html
  */
-public class TabListener<T extends Fragment> implements ActionBar.TabListener
+public class TabListener implements ActionBar.TabListener
 {
 	private Fragment mFragment;
 	private final Activity mActivity;
 	private final String mTag;
-	private final Class<T> mClass;
 
 	/** 
 	 * Construct a new tab-content instance.
@@ -32,11 +31,11 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener
 	 * @param tag  The identifier tag for the fragment
 	 * @param fragmentClass  The fragment's Class, used to instantiate the fragment
 	 */
-	public TabListener(Activity activity, String tag, Class<T> fragmentClass)
+	public TabListener(Activity activity, String tag, Fragment fragment)
 	{
 		mActivity = activity;
 		mTag = tag;
-		mClass = fragmentClass;
+		mFragment = fragment;
 	}
 
 	/* The following are each of the ActionBar.TabListener callbacks */
@@ -44,11 +43,6 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener
 	@Override
 	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
 	{
-		// Check if the fragment is already initialized
-		if (mFragment == null)
-		{
-			mFragment = Fragment.instantiate(mActivity, mClass.getName());
-		}
 		ft.replace(android.R.id.content, mFragment, mTag);
 		ft.attach(mFragment);
 	}
