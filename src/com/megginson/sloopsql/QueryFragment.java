@@ -64,10 +64,10 @@ public class QueryFragment extends Fragment
 	{
         super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
-//
-//		mDatabaseHandler = new DatabaseHandler(getActivity());
-//		mDatabase = mDatabaseHandler.getWritableDatabase();
-//
+
+		mDatabaseHandler = new DatabaseHandler(getActivity());
+		mDatabase = mDatabaseHandler.getWritableDatabase();
+
 //		mQueryText = savedInstanceState.getString(QUERY_TEXT_PROPERTY);
     }
 
