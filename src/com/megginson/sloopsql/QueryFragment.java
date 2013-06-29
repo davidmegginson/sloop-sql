@@ -73,11 +73,9 @@ public class QueryFragment extends Fragment
     }
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container)
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		mFragmentView = inflater.inflate(R.layout.query, container);
-//		setup_ui();
-		return mFragmentView;
+		return inflater.inflate(R.layout.query, container, false);
 	}
 
 	/**
