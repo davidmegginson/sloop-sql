@@ -30,7 +30,7 @@ public class MainActivity extends Activity
 		for (int i = 0; i < 3; i++) {
 			actionBar.addTab(
                 actionBar.newTab()
-				.setText("Tab " + (i + 1))
+				.setText("Query " + (i + 1))
 				.setTabListener(new TabListener<QueryFragment>(this, "query" + i, QueryFragment.class)));
 		}
 	}
