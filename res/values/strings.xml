@@ -9,4 +9,5 @@
 	<string name="label_clear_history">Clear history</string>
 	<string name="label_share">Share</string>
 	<string name="message_history_cleared">History cleared</string>
+	<string name="label_add_query">New query</string>
 </resources>

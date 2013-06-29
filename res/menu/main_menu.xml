@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <item
+        android:id="@+id/item_add_query"
+        android:title="@string/label_add_query"
+		android:icon="@android:drawable/ic_input_add"
+		android:showAsAction="ifRoom" />
+    
+</menu>

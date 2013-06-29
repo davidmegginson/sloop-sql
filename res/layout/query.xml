@@ -33,7 +33,7 @@
 			android:layout_marginLeft="-32dp"
 			android:layout_alignParentTop="true"
 			android:background="@android:color/transparent"
-			android:src="@android:drawable/ic_delete"
+			android:src="@android:drawable/ic_input_delete"
 			/>
 
 	</LinearLayout>

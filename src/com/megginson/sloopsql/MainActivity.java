@@ -6,6 +6,8 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import com.megginson.sloopsql.R;
+import android.view.Menu;
+import android.view.MenuInflater;
 
 /**
  * Main container activity for the UI.
@@ -33,6 +35,14 @@ public class MainActivity extends Activity
 				.setText("Query " + (i + 1))
 				.setTabListener(new TabListener<QueryFragment>(this, "query" + i, QueryFragment.class)));
 		}
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main_menu, menu);
+		return true;		
 	}
 
 }
