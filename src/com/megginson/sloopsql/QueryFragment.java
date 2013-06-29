@@ -3,6 +3,7 @@ package com.megginson.sloopsql;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -41,7 +42,7 @@ public class QueryFragment extends Fragment
 	public final static String QUERY_TEXT_PROPERTY = "queryText";
 
 	private String mQueryText;
-	
+
 	private View mFragmentView;
 
  	private DatabaseHandler mDatabaseHandler;
@@ -68,8 +69,10 @@ public class QueryFragment extends Fragment
 		mDatabaseHandler = new DatabaseHandler(getActivity());
 		mDatabase = mDatabaseHandler.getWritableDatabase();
 
-		// null - why?
-//		mQueryText = savedInstanceState.getString(QUERY_TEXT_PROPERTY);
+		if (savedInstanceState != null)
+		{
+			mQueryText = savedInstanceState.getString(QUERY_TEXT_PROPERTY);
+		}
     }
 
 	@Override
@@ -77,6 +80,13 @@ public class QueryFragment extends Fragment
 	{
 		mFragmentView = inflater.inflate(R.layout.query, container, false);
 		setup_ui();
+
+		if (mQueryText != null)
+		{
+			mQueryView.setText(mQueryText);
+			doExecuteQuery(mQueryView);
+		}
+
 		return mFragmentView;
 	}
 
@@ -112,24 +122,18 @@ public class QueryFragment extends Fragment
 	public void onResume()
 	{
 		super.onResume();
-//		SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
-//		// must copy - return value not safe to modify
-//		Set<String> history = prefs.getStringSet(QUERY_HISTORY_PROPERTY, null);
-//		if (history == null)
-//		{
-//			mQueryHistory = new HashSet<String>();
-//		}
-//		else
-//		{
-//			mQueryHistory = new HashSet<String>(history);
-//		}
-//		update_query_history(null);
-//
-//		if (mQueryText != null)
-//		{
-//			mQueryView.setText(mQueryText);
-//			doExecuteQuery(mQueryView);
-//		}
+		SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+		// must copy - return value not safe to modify
+		Set<String> history = prefs.getStringSet(QUERY_HISTORY_PROPERTY, null);
+		if (history == null)
+		{
+			mQueryHistory = new HashSet<String>();
+		}
+		else
+		{
+			mQueryHistory = new HashSet<String>(history);
+		}
+		update_query_history(null);
 	}
 
 	/**
@@ -139,10 +143,10 @@ public class QueryFragment extends Fragment
 	public void onPause()
 	{
 		super.onPause();
-//		SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
-//		SharedPreferences.Editor editor = prefs.edit();
-//		editor.putStringSet(QUERY_HISTORY_PROPERTY, mQueryHistory);
-//		editor.commit();
+		SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putStringSet(QUERY_HISTORY_PROPERTY, mQueryHistory);
+		editor.commit();
 	}
 
 	/**
@@ -152,7 +156,7 @@ public class QueryFragment extends Fragment
 	public void onSaveInstanceState(Bundle bundle)
 	{
 		super.onSaveInstanceState(bundle);
-//		bundle.putString(QUERY_TEXT_PROPERTY, mQueryView.getText().toString());
+		bundle.putString(QUERY_TEXT_PROPERTY, mQueryView.getText().toString());
 	}
 
 	@Override
@@ -241,19 +245,19 @@ public class QueryFragment extends Fragment
 	{
 		mQueryButton = (Button)mFragmentView.findViewById(R.id.button_query);
 		mQueryButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view)
-			{
-				doExecuteQuery(view);
-			}
-		});
-		
+				public void onClick(View view)
+				{
+					doExecuteQuery(view);
+				}
+			});
+
 		View clearButton = mFragmentView.findViewById(R.id.button_clear);
 		clearButton.setOnClickListener(new View.OnClickListener(){
-			public void onClick(View view)
-			{
-				doClearQuery(view);
-			}
-		});
+				public void onClick(View view)
+				{
+					doClearQuery(view);
+				}
+			});
 
 		mQueryView = (AutoCompleteTextView)mFragmentView.findViewById(R.id.input_query);
 		mQueryView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
