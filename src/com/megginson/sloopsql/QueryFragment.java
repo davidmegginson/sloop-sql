@@ -3,17 +3,18 @@ package com.megginson.sloopsql;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -28,8 +29,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
 
 /**
  * Activity for executing SQL queries.
@@ -64,7 +63,7 @@ public class QueryFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
 	{
         super.onCreate(savedInstanceState);
-//		setHasOptionsMenu(true);
+		setHasOptionsMenu(true);
 //
 //		mDatabaseHandler = new DatabaseHandler(getActivity());
 //		mDatabase = mDatabaseHandler.getWritableDatabase();
@@ -156,7 +155,7 @@ public class QueryFragment extends Fragment
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
-//		inflater.inflate(R.menu.query_menu, menu);
+		inflater.inflate(R.menu.query_menu, menu);
 	}
 
 	@Override
