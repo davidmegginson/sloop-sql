@@ -68,6 +68,7 @@ public class QueryFragment extends Fragment
 		mDatabaseHandler = new DatabaseHandler(getActivity());
 		mDatabase = mDatabaseHandler.getWritableDatabase();
 
+		// null - why?
 //		mQueryText = savedInstanceState.getString(QUERY_TEXT_PROPERTY);
     }
 
@@ -239,6 +240,20 @@ public class QueryFragment extends Fragment
 	private void setup_ui()
 	{
 		mQueryButton = (Button)mFragmentView.findViewById(R.id.button_query);
+		mQueryButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view)
+			{
+				doExecuteQuery(view);
+			}
+		});
+		
+		View clearButton = mFragmentView.findViewById(R.id.button_clear);
+		clearButton.setOnClickListener(new View.OnClickListener(){
+			public void onClick(View view)
+			{
+				doClearQuery(view);
+			}
+		});
 
 		mQueryView = (AutoCompleteTextView)mFragmentView.findViewById(R.id.input_query);
 		mQueryView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
