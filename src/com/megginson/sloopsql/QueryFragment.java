@@ -48,7 +48,7 @@ public class QueryFragment extends Fragment
 	private SQLiteDatabase mDatabase;
 
 	private Cursor mCursor;
-	
+
 	private String mQueryText;
 
 	private Set<String> mQueryHistory = new HashSet<String>();
@@ -57,8 +57,19 @@ public class QueryFragment extends Fragment
 
 	private Button mQueryButton;
 
+
+	//
+	// Lifecycle methods
+	//
+
     /** 
-	 * Called when the activity is first created.
+	 * Lifecycle event: fragment first created.
+	 *
+	 * The argument contains the saved state if Android is restoring
+	 * a previously-existing version of this fragment, or null if it's
+	 * creating the fragment from scratch.
+	 *
+	 * @param savedInstance the fragment's saved state, or null. 
 	 */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -68,32 +79,17 @@ public class QueryFragment extends Fragment
 
 		mDatabaseHandler = new DatabaseHandler(getActivity());
 		mDatabase = mDatabaseHandler.getWritableDatabase();
-		
+
 		if (savedInstanceState != null)
 		{
 			mQueryText = savedInstanceState.getString(QUERY_TEXT_PROPERTY);
 		}
     }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-	{
-		mFragmentView = inflater.inflate(R.layout.query, container, false);
-		
-		setup_ui();
-		
-		return mFragmentView;
-	}
-
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState)
-	{
-		super.onActivityCreated(savedInstanceState);;
-		setRetainInstance(true);
-	}
-	
 	/**
-	 * Free database resources when we destroy the task.
+	 * Lifecycle event: fragment destroyed.
+	 *
+	 * Free up any database resources we're using.
 	 */
 	@Override
 	public void onDestroy()
@@ -118,15 +114,64 @@ public class QueryFragment extends Fragment
 	}
 
 	/**
-	 * Load preferences when the activity resumes.
+	 * Lifecycle event: parent activity created.
+	 *
+	 * This is where we have to set our persistent state (for orientation
+	 * changes, etc.) using {@link #setRetainInstance(boolean)}. This
+	 * setting lets Android preserve some of the fragment's internal
+	 * state (but not its UI).
+	 *
+	 * @param savedInstanceState a bundle for saving any instance-specific
+	 * configuration.
+	 */
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState)
+	{
+		super.onActivityCreated(savedInstanceState);;
+		setRetainInstance(true);
+	}
+
+	/**
+	 * Lifecycle event: fragment needs to (re)draw its view.
+	 *
+	 * Android will set the savedInstanceState to null if it's calling
+	 * this method right after {@link #onCreate(Bundle)}, or if it's
+	 * redrawing a fragment that has set itself to persistent using
+	 * {@link #setRetainInstance(boolean)}. After e.g. orientation
+	 * change, Android can ask the fragment to redraw itself, and if
+	 * the saved state is null, it's up to the fragment to repopulate
+	 * its UI components from internal state.
+	 *
+	 * @param inflater The parent activity's inflater, for building
+	 * the layout from XML resource files.
+	 * @param container The parent activity's {@link ViewGroup} that
+	 * will hold the fragment.
+	 * @param savedInstance the fragment's saved state, or null. 
+	 * @return The root of the fragment's UI.
+	 */
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
+		mFragmentView = inflater.inflate(R.layout.query, container, false);
+
+		setup_ui();
+
+		return mFragmentView;
+	}
+
+	/**
+	 * Lifecycle event: fragment is resuming (or starting for first time).
+	 *
+	 * This is where we read our permanent (non-instance-specific)
+	 * configuration from saved preferences.
 	 */
 	@Override
 	public void onResume()
 	{
 		super.onResume();
-		
+
 		do_execute_query();
-		
+
 		SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
 		// must copy - return value not safe to modify
 		Set<String> history = prefs.getStringSet(QUERY_HISTORY_PROPERTY, null);
@@ -142,7 +187,10 @@ public class QueryFragment extends Fragment
 	}
 
 	/**
-	 * Save preferences when the activity pauses.
+	 * Lifecycle event: fragment is pausing (maybe permanently).
+	 *
+	 * This is where we save our permanent (non-instance-specific)
+	 * configuration in shared preferences.
 	 */
 	@Override
 	public void onPause()
@@ -155,20 +203,43 @@ public class QueryFragment extends Fragment
 	}
 
 	/**
-	 * Saved the temporary runtime state
+	 * Lifecycle event: Android wants us to save the instance state.
+	 *
+	 * Android might use the state to create a new copy of the fragment
+	 * later.
+	 *
+	 * @param savedInstanceState a bundle where we can save the
+	 * fragment's current temporary (instance-specific) state.
 	 */
 	@Override
-	public void onSaveInstanceState(Bundle bundle)
+	public void onSaveInstanceState(Bundle savedInstanceState)
 	{
-		bundle.putString(QUERY_TEXT_PROPERTY, mQueryView.getText().toString());
+		savedInstanceState.putString(QUERY_TEXT_PROPERTY, mQueryView.getText().toString());
 	}
 
+	/**
+	 * Lifecycle event: Android is creating the options menu.
+	 *
+	 * This is where the fragment has the chance to contribute
+	 * extra items.
+	 *
+	 * @param menu The menu to which we can add items.
+	 * @param inflator An inflator for XML-based menu resources.
+	 */
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
 		inflater.inflate(R.menu.query_menu, menu);
 	}
 
+	/**
+	 * Lifecycle event: the user has selected a menu item.
+	 *
+	 * We have an opportunity to intercept it.
+	 *
+	 * @param item The menu item selected.
+	 * @return true if we have handled the item; false otherwise.
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
@@ -185,14 +256,17 @@ public class QueryFragment extends Fragment
 				return super.onOptionsItemSelected(item);
 		}
 	}
+	
+	
+	//
+	// Callbacks for actions a user has performed in the UI
+	//
 
 	/**
-	 * Event: execute a SQL query.
+	 * Action: execute a SQL query.
 	 *
-	 * Respond to a button press to execute the query in the query field and 
-	 * show the results below.
-	 *
-	 * @param view The button that triggered the event.
+	 * Use the text content of {@link #mQueryView} for the query and assign
+	 * to {@link #mQueryText}
 	 */
 	private void do_execute_query()
 	{		
@@ -205,15 +279,21 @@ public class QueryFragment extends Fragment
 	}
 
 	/**
-	 * Clear the query text field.
+	 * Action: clear the query text field.
+	 *
+	 * Sets {@link #mQueryText} and the contents of {@link #mQueryView} to
+	 * the empty string.
 	 */
 	private void do_clear_query(View view)
 	{
 		mQueryText = "";
 		mQueryView.setText(mQueryText);
-		
+
 	}
 
+	/**
+	 * Action: clear query history.
+	 */
 	private void do_clear_history()
 	{
 		mQueryHistory = new HashSet<String>();
@@ -221,6 +301,12 @@ public class QueryFragment extends Fragment
 		Util.toast(getActivity(), getString(R.string.message_history_cleared));
 	}
 
+	/**
+	 * Action: share the current query results
+	 *
+	 * Offers to share the current results as a text/csv file
+	 * named "sloopsql-results.csv".
+	 */
 	private void do_share()
 	{
 		try
@@ -244,10 +330,10 @@ public class QueryFragment extends Fragment
 		}
 	}
 	
-	public String toString()
-	{
-		return "QueryFragment: " + mQueryView.getText();
-	}
+	
+	//
+	// Internal utility methods
+	//
 
 	/**
 	 * Set up the UI components of the activity.
@@ -307,6 +393,13 @@ public class QueryFragment extends Fragment
 		mQueryView.setAdapter(adapter);
 	}
 
+	/**
+	 * Set the fragment's database-results cursor.
+	 *
+	 * Close any existing cursor first, to avoid leaking resources.
+	 *
+	 * @param cursor The new cursor to set.
+	 */
 	private void set_cursor(Cursor cursor)
 	{
 		if (mCursor != null)
@@ -315,6 +408,11 @@ public class QueryFragment extends Fragment
 		}
 		mCursor = cursor;
 	}
+	
+	
+	//
+	// Internal helper classes
+	//
 
 	/**
 	 * Task for running a database query in the background.
