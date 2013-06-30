@@ -11,6 +11,8 @@ import com.megginson.sloopsql.R;
 import java.util.ArrayList;
 import android.widget.Toast;
 import java.util.List;
+import android.os.Parcelable;
+import android.view.ViewGroup;
 
 /**
  * Main container activity for the UI.
@@ -36,14 +38,20 @@ public class MainActivity extends Activity
 
 		// Specify that tabs should be displayed in the action bar.
 		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		
-		restore_tabs(savedInstanceState);
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle savedInstanceState)
 	{
+		super.onSaveInstanceState(savedInstanceState);
 		save_tabs(savedInstanceState);
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState)
+	{
+		super.onRestoreInstanceState(savedInstanceState);
+		restore_tabs(savedInstanceState);
 	}
 
 	@Override
@@ -79,16 +87,16 @@ public class MainActivity extends Activity
 	private void do_add_query_tab()
 	{
 		String tag = "query" + mQueryCounter;
-		ActionBar.Tab tab = add_fragment_tab(tag, new QueryFragment());
+		ActionBar.Tab tab = add_fragment_tab("Query " + (mQueryCounter + 1), tag, new QueryFragment());
 		tab.select();
 		mQueryCounter++;
 	}
 
-	private ActionBar.Tab add_fragment_tab(String tag, Fragment fragment)
+	private ActionBar.Tab add_fragment_tab(String label, String tag, Fragment fragment)
 	{
 		TabListener listener = new TabListener(this, R.id.fragment_container, tag, new QueryFragment());
 		ActionBar.Tab tab = mActionBar.newTab()
-			.setText("Query " + (mQueryCounter + 1))
+			.setText(label)
 			.setTabListener(listener);
 		// there's no getTabListener() method, so save a copy here
 		tab.setTag(listener);
@@ -109,25 +117,56 @@ public class MainActivity extends Activity
 		}
 		refresh_options_menu();
 	}
-	
+
 	private void restore_tabs(Bundle savedInstanceState)
 	{
-		
+		mQueryCounter = savedInstanceState.getInt("queryCounter");
+		int selectedTabIndex = savedInstanceState.getInt("selectedTabIndex");
+		ArrayList<String> fragmentTags = savedInstanceState.getStringArrayList("fragmentTags");
+		ArrayList<String> tabTitles = savedInstanceState.getStringArrayList("tabTitles");
+
+		if (tabTitles != null && fragmentTags != null)
+		{
+			for (int i = 0; i < tabTitles.size() && i < fragmentTags.size(); i++)
+			{
+				String tabTitle = tabTitles.get(i);
+				String fragmentTag = fragmentTags.get(i);
+				try
+				{
+					Fragment fragment = getFragmentManager().getFragment(savedInstanceState, fragmentTag);
+					add_fragment_tab(tabTitle, fragmentTag, fragment);
+				}
+				catch (Throwable t)
+				{
+					Util.toast(this, Util.makeStackTrace(t));
+				}
+			}
+		}
 	}
-	
+
 	private void save_tabs(Bundle savedInstanceState)
 	{
+		ArrayList<String> tabTitles = new ArrayList<String>();
 		ArrayList<String> fragmentTags = new ArrayList<String>();
-		ArrayList<String> TabTitles = new ArrayList<String>();
-		for(int i = 0; i < mActionBar.getTabCount(); i++) {
+
+		for (int i = 0; i < mActionBar.getTabCount(); i++)
+		{
 			ActionBar.Tab tab = mActionBar.getTabAt(i);
 			TabListener listener = (TabListener)tab.getTag();
-			fragmentTags.add(listener.getTag());
-			TabTitles.add(tab.getText().toString());
+			String tabTitle = tab.getText().toString();
+			String fragmentTag = listener.getTag();
+			Fragment fragment = listener.getFragment();
+
+			tabTitles.add(tabTitle);
+			fragmentTags.add(fragmentTag);
+			getFragmentManager().putFragment(savedInstanceState, 
+											 fragmentTag, 
+											 fragment);
 		}
+
 		savedInstanceState.putInt("queryCounter", mQueryCounter);
-		savedInstanceState.putInt("selectedTab", mActionBar.getSelectedNavigationIndex());
-		savedInstanceState.putStringArrayList("tabTitles", TabTitles);
+		savedInstanceState.putInt("selectedTabIndex", mActionBar.getSelectedNavigationIndex());
+		savedInstanceState.putStringArrayList("tabTitles", tabTitles);
 		savedInstanceState.putStringArrayList("fragmentTags", fragmentTags);
 	}
 
@@ -136,18 +175,21 @@ public class MainActivity extends Activity
 	 */
 	private void refresh_options_menu()
 	{
-		MenuItem closeTabItem = mOptionsMenu.findItem(R.id.item_close_tab);
-		if (closeTabItem != null)
+		if (mOptionsMenu != null)
 		{
-			if (mActionBar.getTabCount() > 0)
+			MenuItem closeTabItem = mOptionsMenu.findItem(R.id.item_close_tab);
+			if (closeTabItem != null)
 			{
-				closeTabItem.setVisible(true);
+				if (mActionBar.getTabCount() > 0)
+				{
+					closeTabItem.setVisible(true);
+				}
+				else
+				{
+					closeTabItem.setVisible(false);
+				}
+				invalidateOptionsMenu();
 			}
-			else
-			{
-				closeTabItem.setVisible(false);
-			}
-			invalidateOptionsMenu();
 		}
 	}
 }

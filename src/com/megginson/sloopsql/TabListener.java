@@ -48,7 +48,7 @@ public class TabListener implements ActionBar.TabListener
 	{
 		if (!mIsAdded)
 		{
-			ft.add(mParentId, mFragment, mTag);
+			ft.replace(mParentId, mFragment, mTag);
 			mIsAdded = true;
 		}
 		ft.attach(mFragment);
@@ -57,13 +57,9 @@ public class TabListener implements ActionBar.TabListener
 	@Override
 	public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft)
 	{
-		if (mFragment != null)
-		{
-			// Detach the fragment, because another one is being attached
-			ft.detach(mFragment);
-		}
+		ft.detach(mFragment);
 	}
-
+	
 	@Override
 	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft)
 	{

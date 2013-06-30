@@ -82,6 +82,13 @@ public class QueryFragment extends Fragment
 		return mFragmentView;
 	}
 
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState)
+	{
+		super.onActivityCreated(savedInstanceState);;
+		setRetainInstance(true);
+	}
+	
 	/**
 	 * Free database resources when we destroy the task.
 	 */
