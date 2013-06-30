@@ -94,7 +94,7 @@ public class MainActivity extends Activity
 
 	private ActionBar.Tab add_fragment_tab(String label, String tag, Fragment fragment)
 	{
-		TabListener listener = new TabListener(this, R.id.fragment_container, tag, new QueryFragment());
+		TabListener listener = new TabListener(this, R.id.fragment_container, tag, fragment);
 		ActionBar.Tab tab = mActionBar.newTab()
 			.setText(label)
 			.setTabListener(listener);
@@ -131,15 +131,9 @@ public class MainActivity extends Activity
 			{
 				String tabTitle = tabTitles.get(i);
 				String fragmentTag = fragmentTags.get(i);
-				try
-				{
-					Fragment fragment = getFragmentManager().getFragment(savedInstanceState, fragmentTag);
-					add_fragment_tab(tabTitle, fragmentTag, fragment);
-				}
-				catch (Throwable t)
-				{
-					Util.toast(this, Util.makeStackTrace(t));
-				}
+				Fragment fragment = getFragmentManager().getFragment(savedInstanceState, fragmentTag);
+				Util.toast(this, fragment.toString());
+				add_fragment_tab(tabTitle, fragmentTag, fragment);
 			}
 		}
 		mActionBar.setSelectedNavigationItem(selectedTabIndex);

@@ -48,6 +48,8 @@ public class QueryFragment extends Fragment
 	private SQLiteDatabase mDatabase;
 
 	private Cursor mCursor;
+	
+	private String mQueryText;
 
 	private Set<String> mQueryHistory = new HashSet<String>();
 
@@ -66,19 +68,20 @@ public class QueryFragment extends Fragment
 
 		mDatabaseHandler = new DatabaseHandler(getActivity());
 		mDatabase = mDatabaseHandler.getWritableDatabase();
+		
+		if (savedInstanceState != null)
+		{
+			mQueryText = savedInstanceState.getString(QUERY_TEXT_PROPERTY);
+		}
     }
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		mFragmentView = inflater.inflate(R.layout.query, container, false);
+		
 		setup_ui();
 		
-		if (savedInstanceState != null)
-		{
-			mQueryView.setText(savedInstanceState.getString(QUERY_TEXT_PROPERTY));
-		}
-
 		return mFragmentView;
 	}
 
@@ -157,7 +160,6 @@ public class QueryFragment extends Fragment
 	@Override
 	public void onSaveInstanceState(Bundle bundle)
 	{
-		super.onSaveInstanceState(bundle);
 		bundle.putString(QUERY_TEXT_PROPERTY, mQueryView.getText().toString());
 	}
 
@@ -174,10 +176,10 @@ public class QueryFragment extends Fragment
 		switch (item.getItemId())
 		{
 			case R.id.item_clear_history:
-				doClearHistory();
+				do_clear_history();
 				return true;
 			case R.id.item_share:
-				doShare();
+				do_share();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -192,32 +194,34 @@ public class QueryFragment extends Fragment
 	 *
 	 * @param view The button that triggered the event.
 	 */
-	public void do_execute_query()
+	private void do_execute_query()
 	{		
-		String queryText = mQueryView.getText().toString();
+		mQueryText = mQueryView.getText().toString();
 
-		if (queryText != null && queryText.length() > 0)
+		if (mQueryText != null && mQueryText.length() > 0)
 		{
-			new QueryTask().execute(queryText);
+			new QueryTask().execute(mQueryText);
 		}
 	}
 
 	/**
 	 * Clear the query text field.
 	 */
-	public void doClearQuery(View view)
+	private void do_clear_query(View view)
 	{
-		mQueryView.setText("");
+		mQueryText = "";
+		mQueryView.setText(mQueryText);
+		
 	}
 
-	public void doClearHistory()
+	private void do_clear_history()
 	{
 		mQueryHistory = new HashSet<String>();
 		update_query_history(null);
-		show_toast(getString(R.string.message_history_cleared));
+		Util.toast(getActivity(), getString(R.string.message_history_cleared));
 	}
 
-	public void doShare()
+	private void do_share()
 	{
 		try
 		{
@@ -236,8 +240,13 @@ public class QueryFragment extends Fragment
 		}
 		catch (Throwable t)
 		{
-			show_toast(t.getMessage());
+			Util.toast(getActivity(), t.getMessage());
 		}
+	}
+	
+	public String toString()
+	{
+		return "QueryFragment: " + mQueryView.getText();
 	}
 
 	/**
@@ -257,11 +266,12 @@ public class QueryFragment extends Fragment
 		clearButton.setOnClickListener(new View.OnClickListener(){
 				public void onClick(View view)
 				{
-					doClearQuery(view);
+					do_clear_query(view);
 				}
 			});
 
 		mQueryView = (AutoCompleteTextView)mFragmentView.findViewById(R.id.input_query);
+		mQueryView.setText(mQueryText);
 		mQueryView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 				@Override
 				public boolean onEditorAction(TextView view, int actionId, KeyEvent event)
@@ -295,11 +305,6 @@ public class QueryFragment extends Fragment
 			new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, 
 									 new ArrayList<String>(mQueryHistory));
 		mQueryView.setAdapter(adapter);
-	}
-
-	private void show_toast(String message)
-	{
-		Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
 	}
 
 	private void set_cursor(Cursor cursor)
@@ -350,7 +355,7 @@ public class QueryFragment extends Fragment
 		{
 			if (result.isError())
 			{
-				show_toast(result.getThrowable().getMessage());
+				Util.toast(getActivity(), result.getThrowable().getMessage());
 				return;
 			}
 
@@ -385,3 +390,4 @@ public class QueryFragment extends Fragment
 	}
 
 }
+
