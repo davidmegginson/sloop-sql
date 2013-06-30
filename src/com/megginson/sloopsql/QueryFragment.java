@@ -19,11 +19,9 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.megginson.sloopsql.R;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -37,25 +35,52 @@ import java.util.Set;
 public class QueryFragment extends Fragment
 {
 
+    //
+	// Constants
+	//
+	
+	/**
+	 * Property name for saved history.
+	 */
 	public final static String QUERY_HISTORY_PROPERTY = "queryHistory";
 
+	/**
+	 * Property name for saved SQL query.
+	 */
 	public final static String QUERY_TEXT_PROPERTY = "queryText";
+	
+	
+	//
+	// Internal fragment state
+	//
 
+	/**
+	 * The fragment's root view. set in {@link #onCreateView}
+	 */
 	private View mFragmentView;
 
+	// TODO move to parent or application level
  	private DatabaseHandler mDatabaseHandler;
 
+	/**
+	 * The database we're currently querying.
+	 */
 	private SQLiteDatabase mDatabase;
 
-	private Cursor mCursor;
-
+	/**
+	 * The current SQL query text.
+	 */
 	private String mQueryText;
 
+	/**
+	 * The current query results (if any)
+	 */
+	private Cursor mCursor;
+
+	/**
+	 * The history of queries we've executed.
+	 */
 	private Set<String> mQueryHistory = new HashSet<String>();
-
-	private AutoCompleteTextView mQueryView;
-
-	private Button mQueryButton;
 
 
 	//
@@ -214,7 +239,7 @@ public class QueryFragment extends Fragment
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState)
 	{
-		savedInstanceState.putString(QUERY_TEXT_PROPERTY, mQueryView.getText().toString());
+		savedInstanceState.putString(QUERY_TEXT_PROPERTY, get_query_view().getText().toString());
 	}
 
 	/**
@@ -256,8 +281,8 @@ public class QueryFragment extends Fragment
 				return super.onOptionsItemSelected(item);
 		}
 	}
-	
-	
+
+
 	//
 	// Callbacks for actions a user has performed in the UI
 	//
@@ -270,7 +295,7 @@ public class QueryFragment extends Fragment
 	 */
 	private void do_execute_query()
 	{		
-		mQueryText = mQueryView.getText().toString();
+		mQueryText = get_query_view().getText().toString();
 
 		if (mQueryText != null && mQueryText.length() > 0)
 		{
@@ -287,7 +312,7 @@ public class QueryFragment extends Fragment
 	private void do_clear_query(View view)
 	{
 		mQueryText = "";
-		mQueryView.setText(mQueryText);
+		get_query_view().setText(mQueryText);
 
 	}
 
@@ -329,10 +354,14 @@ public class QueryFragment extends Fragment
 			Util.toast(getActivity(), t.getMessage());
 		}
 	}
-	
-	
+
+
 	//
-	// Internal utility methods
+	// UI functions
+	//
+	// (It's not safe to store references to UI components directly
+	// in variables, since the fragment's state can outlast UI
+	// changes, so we use dynamic accessors instead.)
 	//
 
 	/**
@@ -340,14 +369,6 @@ public class QueryFragment extends Fragment
 	 */
 	private void setup_ui()
 	{
-		mQueryButton = (Button)mFragmentView.findViewById(R.id.button_query);
-		mQueryButton.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View view)
-				{
-					do_execute_query();
-				}
-			});
-
 		View clearButton = mFragmentView.findViewById(R.id.button_clear);
 		clearButton.setOnClickListener(new View.OnClickListener(){
 				public void onClick(View view)
@@ -356,15 +377,15 @@ public class QueryFragment extends Fragment
 				}
 			});
 
-		mQueryView = (AutoCompleteTextView)mFragmentView.findViewById(R.id.input_query);
-		mQueryView.setText(mQueryText);
-		mQueryView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+		AutoCompleteTextView queryView = get_query_view();
+		queryView.setText(mQueryText);
+		queryView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 				@Override
 				public boolean onEditorAction(TextView view, int actionId, KeyEvent event)
 				{
 					if (actionId == EditorInfo.IME_NULL)
 					{
-						mQueryButton.performClick();
+						do_execute_query();
 						return true;
 					}
 					else
@@ -376,21 +397,49 @@ public class QueryFragment extends Fragment
 	}
 
 	/**
+	 * Get the query field from the UI.
+	 *
+	 * This is the view that holds the SQL text for our query.
+	 *
+	 * @return the query view, or null if the UI isn't set up.
+	 */
+	private AutoCompleteTextView get_query_view()
+	{
+		if (mFragmentView != null)
+		{
+			return (AutoCompleteTextView)mFragmentView.findViewById(R.id.input_query);
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+
+	//
+	// Internal utility methods
+	//
+
+	/**
 	 * Update the query history for autocomplete.
 	 *
 	 * If the parameter is not null, add it to the history first; otherwise,
-	 * just set the history from the mQueryHistory list.
+	 * just set the history from the mQueryHistory list.  {@link 
+	 * #do_execute_query()} calls this method only for successful queries,
+	 * to avoid cluttering the history with syntax errors.
+	 *
+	 * @param queryText The SQL query to add to the history.
 	 */
-	private void update_query_history(String entry)
+	private void update_query_history(String queryText)
 	{
-		if (entry != null)
+		if (queryText != null)
 		{
-			mQueryHistory.add(entry);
+			mQueryHistory.add(queryText);
 		}
 		ArrayAdapter<String> adapter = 
 			new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, 
 									 new ArrayList<String>(mQueryHistory));
-		mQueryView.setAdapter(adapter);
+		get_query_view().setAdapter(adapter);
 	}
 
 	/**
@@ -408,8 +457,8 @@ public class QueryFragment extends Fragment
 		}
 		mCursor = cursor;
 	}
-	
-	
+
+
 	//
 	// Internal helper classes
 	//
@@ -420,10 +469,22 @@ public class QueryFragment extends Fragment
 	private class QueryTask extends AsyncTask<String, Integer, AsyncResult<Cursor>>
 	{
 
+		/**
+		 * Text of the SQL query.
+		 */
 		private String mQueryText;
 
+		
 		/**
-		 * Run the SQL query (called from a background thread)
+		 * Run the SQL query
+		 *
+		 * This method runs in a background thread.  The {@link ASyncTask}
+		 * takes care of getting it to {@link #onPostExecute} in the
+		 * main thread.
+		 *
+		 * @param queries An array of SQL queries to execute (always
+		 * just one for now)
+		 * @return The result of executing the query.
 		 */
 		@Override
 		protected AsyncResult<Cursor> doInBackground(String ... queries)
@@ -446,32 +507,43 @@ public class QueryFragment extends Fragment
 		}
 
 		/**
-		 * Handle the SQL result (called from the main UI thread)
+		 * Handle the SQL result
+		 * 
+		 * This method runs in the main UI thread.  It receives the
+		 * rescult of {@link #doInBackground}, and can use it to
+		 * modify the UI safely.
+		 *
+		 * @param result The result of the background query.
 		 */
 		@Override
 		protected void onPostExecute(AsyncResult<Cursor> result)
 		{
+			// If there's an error, tell the user and proceed no further.
 			if (result.isError())
 			{
 				Util.toast(getActivity(), result.getThrowable().getMessage());
 				return;
 			}
 
-			// stores in mCursor after closing any old one
-			set_cursor(result.getResult());
-			if (mCursor == null)
+			// Register the new query result
+			Cursor cursor = result.getResult();
+			if (result == null)
 			{
 				return;
 			}
-
+			set_cursor(cursor);
+			
+			// It succeeded, so add to query history.
 			update_query_history(mQueryText);
 
+			// Look up the views we're going to need.
 			LinearLayout headerView  = (LinearLayout)mFragmentView.findViewById(R.id.layout_header);
 			ListView resultsView = (ListView)mFragmentView.findViewById(R.id.list_results);
 			TextView messageView = (TextView)mFragmentView.findViewById(R.id.text_message);
 
+			// Set up the results header view.
 			headerView.removeAllViews();
-			if (mCursor.moveToNext())
+			if (mCursor.moveToFirst())
 			{
 				for (int i = 0; i < mCursor.getColumnCount(); i++)
 				{
@@ -481,7 +553,10 @@ public class QueryFragment extends Fragment
 				}	
 			}
 
+			// Set up the message view.
 			messageView.setText(String.format(getString(R.string.message_query_result), mCursor.getCount()));
+
+			// Set up the results list.
 			resultsView.setAdapter(new QueryResultAdapter(mCursor));
 		}
 
