@@ -142,6 +142,7 @@ public class MainActivity extends Activity
 				}
 			}
 		}
+		mActionBar.setSelectedNavigationItem(selectedTabIndex);
 	}
 
 	private void save_tabs(Bundle savedInstanceState)
