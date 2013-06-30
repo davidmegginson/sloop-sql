@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import com.megginson.sloopsql.R;
+import android.app.Fragment;
 
 /**
  * Main container activity for the UI.
@@ -17,7 +18,7 @@ public class MainActivity extends Activity
 {
 
  	private ActionBar mActionBar;
-	
+
 	private Menu mOptionsMenu;
 
 	private int mQueryCounter = 0;
@@ -67,38 +68,48 @@ public class MainActivity extends Activity
 	private void do_add_query_tab()
 	{
 		String tag = "query" + mQueryCounter;
+		ActionBar.Tab tab = add_fragment_tab(tag, new QueryFragment());
+		tab.select();
+		mQueryCounter++;
+	}
+
+	private ActionBar.Tab add_fragment_tab(String tag, Fragment fragment)
+	{
 		ActionBar.Tab tab = mActionBar.newTab()
 			.setText("Query " + (mQueryCounter + 1))
 			.setTabListener(new TabListener(this, R.id.fragment_container, tag, new QueryFragment()));
 		mActionBar.addTab(tab);
-		tab.select();
 		refresh_options_menu();
-		mQueryCounter++;
+		return tab;
 	}
-
+	
 	/**
-	* Close the current tab.
-	*/
+	 * Close the current tab.
+	 */
 	private void do_close_current_tab()
 	{
 		ActionBar.Tab currentTab = mActionBar.getSelectedTab();
-		if (currentTab != null) {
+		if (currentTab != null)
+		{
 			mActionBar.removeTab(currentTab);
 		}
 		refresh_options_menu();
 	}
-	
+
 	/**
-	* Refresh the options menu based on current tab state.
-	*/
+	 * Refresh the options menu based on current tab state.
+	 */
 	private void refresh_options_menu()
 	{
 		MenuItem closeTabItem = mOptionsMenu.findItem(R.id.item_close_tab);
 		if (closeTabItem != null)
 		{
-			if (mActionBar.getTabCount() > 0) {
+			if (mActionBar.getTabCount() > 0)
+			{
 				closeTabItem.setVisible(true);
-			} else {
+			}
+			else
+			{
 				closeTabItem.setVisible(false);
 			}
 			invalidateOptionsMenu();
