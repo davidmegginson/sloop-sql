@@ -2,12 +2,15 @@ package com.megginson.sloopsql;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import com.megginson.sloopsql.R;
-import android.app.Fragment;
+import java.util.ArrayList;
+import android.widget.Toast;
+import java.util.List;
 
 /**
  * Main container activity for the UI.
@@ -33,6 +36,14 @@ public class MainActivity extends Activity
 
 		// Specify that tabs should be displayed in the action bar.
 		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		
+		restore_tabs(savedInstanceState);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle savedInstanceState)
+	{
+		save_tabs(savedInstanceState);
 	}
 
 	@Override
@@ -75,14 +86,17 @@ public class MainActivity extends Activity
 
 	private ActionBar.Tab add_fragment_tab(String tag, Fragment fragment)
 	{
+		TabListener listener = new TabListener(this, R.id.fragment_container, tag, new QueryFragment());
 		ActionBar.Tab tab = mActionBar.newTab()
 			.setText("Query " + (mQueryCounter + 1))
-			.setTabListener(new TabListener(this, R.id.fragment_container, tag, new QueryFragment()));
+			.setTabListener(listener);
+		// there's no getTabListener() method, so save a copy here
+		tab.setTag(listener);
 		mActionBar.addTab(tab);
 		refresh_options_menu();
 		return tab;
 	}
-	
+
 	/**
 	 * Close the current tab.
 	 */
@@ -94,6 +108,27 @@ public class MainActivity extends Activity
 			mActionBar.removeTab(currentTab);
 		}
 		refresh_options_menu();
+	}
+	
+	private void restore_tabs(Bundle savedInstanceState)
+	{
+		
+	}
+	
+	private void save_tabs(Bundle savedInstanceState)
+	{
+		ArrayList<String> fragmentTags = new ArrayList<String>();
+		ArrayList<String> TabTitles = new ArrayList<String>();
+		for(int i = 0; i < mActionBar.getTabCount(); i++) {
+			ActionBar.Tab tab = mActionBar.getTabAt(i);
+			TabListener listener = (TabListener)tab.getTag();
+			fragmentTags.add(listener.getTag());
+			TabTitles.add(tab.getText().toString());
+		}
+		savedInstanceState.putInt("queryCounter", mQueryCounter);
+		savedInstanceState.putInt("selectedTab", mActionBar.getSelectedNavigationIndex());
+		savedInstanceState.putStringArrayList("tabTitles", TabTitles);
+		savedInstanceState.putStringArrayList("fragmentTags", fragmentTags);
 	}
 
 	/**

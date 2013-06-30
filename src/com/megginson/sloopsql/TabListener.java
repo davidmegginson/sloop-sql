@@ -23,7 +23,8 @@ public class TabListener implements ActionBar.TabListener
 	private final Activity mActivity;
 	private final int mParentId;
 	private final String mTag;
-	private Fragment mFragment;
+	private final Fragment mFragment;
+	private boolean mIsAdded = false;
 
 	/** 
 	 * Construct a new tab-content instance.
@@ -45,7 +46,11 @@ public class TabListener implements ActionBar.TabListener
 	@Override
 	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
 	{
-		ft.replace(mParentId, mFragment, mTag);
+		if (!mIsAdded)
+		{
+			ft.add(mParentId, mFragment, mTag);
+			mIsAdded = true;
+		}
 		ft.attach(mFragment);
 	}
 
@@ -64,5 +69,22 @@ public class TabListener implements ActionBar.TabListener
 	{
 		// User selected the already selected tab. Usually do nothing.
 	}
+
+	/**
+	 * Return the fragment's tag.
+	 */
+	public String getTag()
+	{
+		return mTag;
+	}
+
+	/**
+	 * Return the fragment.
+	 */
+	public Fragment getFragment()
+	{
+		return mFragment;
+	}
+
 }
 
