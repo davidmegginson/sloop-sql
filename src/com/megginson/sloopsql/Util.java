@@ -48,11 +48,11 @@ public final class Util
 	 */
 	public static String makeStackTrace(Throwable t)
 	{
-		StringBuffer s = new StringBuffer();
+		StringBuffer s = new StringBuffer(t.getMessage());
 		for (StackTraceElement e : t.getStackTrace())
 		{
-			s.append(e.toString());
 			s.append('\n');
+			s.append(e.toString());
 		}
 		return s.toString();
 	}
