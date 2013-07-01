@@ -121,7 +121,10 @@ public class MainActivity extends Activity
 	public boolean onPrepareOptionsMenu(Menu menu)
 	{
 		super.onPrepareOptionsMenu(menu);
+		
+		// Hide the close tab item if there are no tabs open
 		menu.findItem(R.id.item_close_tab).setVisible(getActionBar().getTabCount() > 0);
+
 		return true;		
 	}
 	
