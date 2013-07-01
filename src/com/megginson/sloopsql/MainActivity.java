@@ -186,6 +186,7 @@ public class MainActivity extends Activity
 	 */
 	private void restore_tabs(Bundle savedInstanceState)
 	{
+		((ViewGroup)findViewById(R.id.fragment_container)).removeAllViews();
 		mQueryCounter = savedInstanceState.getInt("queryCounter");
 		int selectedTabIndex = savedInstanceState.getInt("selectedTabIndex");
 		ArrayList<Parcelable> fragmentStates = savedInstanceState.getParcelableArrayList("fragmentStates");
@@ -232,17 +233,9 @@ public class MainActivity extends Activity
 			String tabTitle = tab.getText().toString();
 			Fragment fragment = listener.getFragment();
 
-			// the fragment manager thread sometimes isn't caught up
-			try
-			{
-				Fragment.SavedState fragmentState = getFragmentManager().saveFragmentInstanceState(fragment);
-				tabTitles.add(tabTitle);
-				fragmentStates.add(fragmentState);
-			}
-			catch (Throwable t)
-			{
-				Util.toast(this, t.getMessage());
-			}
+			Fragment.SavedState fragmentState = getFragmentManager().saveFragmentInstanceState(fragment);
+			tabTitles.add(tabTitle);
+			fragmentStates.add(fragmentState);
 		}
 
 		savedInstanceState.putInt("queryCounter", mQueryCounter);

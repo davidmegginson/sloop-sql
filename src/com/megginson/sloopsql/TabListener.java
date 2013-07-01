@@ -20,10 +20,8 @@ import android.app.FragmentTransaction;
  */
 public class TabListener implements ActionBar.TabListener
 {
-	private final Activity mActivity;
-	private final int mParentId;
-	private final Fragment mFragment;
-	private boolean mIsDetached = false;
+
+ 	private final Fragment mFragment;
 
 	/** 
 	 * Construct a new tab-content instance.
@@ -33,9 +31,11 @@ public class TabListener implements ActionBar.TabListener
 	 */
 	public TabListener(Activity activity, int parentId, Fragment fragment)
 	{
-		mActivity = activity;
-		mParentId = parentId;
 		mFragment = fragment;
+		
+		// add and detach fragment immediately so that it's in the manager
+		activity.getFragmentManager().beginTransaction().add(parentId, fragment).commit();
+		activity.getFragmentManager().beginTransaction().detach(fragment).commit();
 	}
 
 	/* The following are each of the ActionBar.TabListener callbacks */
@@ -43,21 +43,13 @@ public class TabListener implements ActionBar.TabListener
 	@Override
 	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
 	{
-		if (mIsDetached)
-		{
 			ft.attach(mFragment);
-		}
-		else
-		{
-			ft.replace(mParentId, mFragment);
-		}
 	}
 
 	@Override
 	public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft)
 	{
 		ft.detach(mFragment);
-		mIsDetached = true;
 	}
 
 	@Override
