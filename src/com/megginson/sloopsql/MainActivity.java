@@ -27,11 +27,6 @@ public class MainActivity extends Activity
 	//
 
 	/**
-	 * Saved pointer to the options menu
-	 */
-	private Menu mOptionsMenu;
-
-	/**
 	 * Serial counter for query tabs
 	 */
 	private int mQueryCounter = 0;
@@ -111,29 +106,25 @@ public class MainActivity extends Activity
 		
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main_menu, menu);
-		// need to save a reference
-		mOptionsMenu = menu;
 		return true;		
 	}
 	
 	/**
-	 * Lifecycle event: post-creation prep for the options menu.
+	 * Lifecycle event: Android is preparing the options menu.
 	 *
-	 * @param menu The menu to which we can add items.
+	 * This is where the activity can do extra config for menu items.
+	 *
+	 * @param menu The menu which we can configure.
 	 * @return true to show the menu 
 	 */
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)
 	{
 		super.onPrepareOptionsMenu(menu);
-		
-		// do this here, to avoid infinite recursion in some
-		// Android versions
-		refresh_options_menu();
-
-		return true;
+		menu.findItem(R.id.item_close_tab).setVisible(getActionBar().getTabCount() > 0);
+		return true;		
 	}
-
+	
 	/**
 	 * Lifecycle event: user has selected a menu item.
 	 *
@@ -184,8 +175,8 @@ public class MainActivity extends Activity
 		if (currentTab != null)
 		{
 			getActionBar().removeTab(currentTab);
+			invalidateOptionsMenu();
 		}
-		refresh_options_menu();
 	}
 	
 
@@ -288,29 +279,8 @@ public class MainActivity extends Activity
 		// there's no getTabListener() method, so save a copy here
 		tab.setTag(listener);
 		getActionBar().addTab(tab);
-		refresh_options_menu();
+		invalidateOptionsMenu();
 		return tab;
 	}
 
-	/**
-	 * Refresh the options menu based on current tab state.
-	 *
-	 * Show the close item only if there are open tabs.
-	 */
-	private void refresh_options_menu()
-	{
-		if (mOptionsMenu != null)
-		{
-			MenuItem closeTabItem = mOptionsMenu.findItem(R.id.item_close_tab);
-			if (getActionBar().getTabCount() > 0)
-			{
-				closeTabItem.setVisible(true);
-			}
-			else
-			{
-				closeTabItem.setVisible(false);
-			}
-			invalidateOptionsMenu();
-		}
-	}
 }
