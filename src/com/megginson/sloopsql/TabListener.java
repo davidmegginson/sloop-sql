@@ -22,7 +22,6 @@ public class TabListener implements ActionBar.TabListener
 {
 	private final Activity mActivity;
 	private final int mParentId;
-	private final String mTag;
 	private final Fragment mFragment;
 	private boolean mIsDetached = false;
 
@@ -30,14 +29,12 @@ public class TabListener implements ActionBar.TabListener
 	 * Construct a new tab-content instance.
 	 *
 	 * @param activity  The host Activity, used to instantiate the fragment
-	 * @param tag  The identifier tag for the fragment
 	 * @param fragmentClass  The fragment's Class, used to instantiate the fragment
 	 */
-	public TabListener(Activity activity, int parentId, String tag, Fragment fragment)
+	public TabListener(Activity activity, int parentId, Fragment fragment)
 	{
 		mActivity = activity;
 		mParentId = parentId;
-		mTag = tag;
 		mFragment = fragment;
 	}
 
@@ -52,7 +49,7 @@ public class TabListener implements ActionBar.TabListener
 		}
 		else
 		{
-			ft.replace(mParentId, mFragment, mTag);
+			ft.replace(mParentId, mFragment);
 		}
 	}
 
@@ -67,14 +64,6 @@ public class TabListener implements ActionBar.TabListener
 	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft)
 	{
 		// User selected the already selected tab. Usually do nothing.
-	}
-
-	/**
-	 * Return the fragment's tag.
-	 */
-	public String getTag()
-	{
-		return mTag;
 	}
 
 	/**

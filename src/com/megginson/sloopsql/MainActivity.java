@@ -9,6 +9,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import com.megginson.sloopsql.R;
 import java.util.ArrayList;
+import android.os.Parcelable;
+import android.view.ViewGroup;
 
 /**
  * Main container activity for the UI.
@@ -150,8 +152,7 @@ public class MainActivity extends Activity
 	 */
 	private void do_add_query_tab()
 	{
-		String tag = "query" + mQueryCounter;
-		ActionBar.Tab tab = add_fragment_tab("Query " + (mQueryCounter + 1), tag, new QueryFragment());
+		ActionBar.Tab tab = add_fragment_tab("Query " + (mQueryCounter + 1), new QueryFragment());
 		tab.select();
 		mQueryCounter++;
 	}
@@ -187,20 +188,21 @@ public class MainActivity extends Activity
 	{
 		mQueryCounter = savedInstanceState.getInt("queryCounter");
 		int selectedTabIndex = savedInstanceState.getInt("selectedTabIndex");
-		ArrayList<String> fragmentTags = savedInstanceState.getStringArrayList("fragmentTags");
+		ArrayList<Parcelable> fragmentStates = savedInstanceState.getParcelableArrayList("fragmentStates");
 		ArrayList<String> tabTitles = savedInstanceState.getStringArrayList("tabTitles");
 
-		if (tabTitles != null && fragmentTags != null)
+		if (tabTitles != null && fragmentStates != null)
 		{
-			for (int i = 0; i < tabTitles.size() && i < fragmentTags.size(); i++)
+			for (int i = 0; i < tabTitles.size() && i < fragmentStates.size(); i++)
 			{
 				String tabTitle = tabTitles.get(i);
-				String fragmentTag = fragmentTags.get(i);
-				Fragment fragment = getFragmentManager().getFragment(savedInstanceState, fragmentTag);
-				add_fragment_tab(tabTitle, fragmentTag, fragment);
+				Fragment.SavedState fragmentState = (Fragment.SavedState)fragmentStates.get(i);
+				Fragment fragment = new QueryFragment();
+				fragment.setInitialSavedState(fragmentState);
+				add_fragment_tab(tabTitle, fragment);
 			}
+			getActionBar().setSelectedNavigationItem(selectedTabIndex);
 		}
-		getActionBar().setSelectedNavigationItem(selectedTabIndex);
 	}
 
 	/**
@@ -221,27 +223,32 @@ public class MainActivity extends Activity
 	private void save_tabs(Bundle savedInstanceState)
 	{
 		ArrayList<String> tabTitles = new ArrayList<String>();
-		ArrayList<String> fragmentTags = new ArrayList<String>();
+		ArrayList<Parcelable> fragmentStates = new ArrayList<Parcelable>();
 
 		for (int i = 0; i < getActionBar().getTabCount(); i++)
 		{
 			ActionBar.Tab tab = getActionBar().getTabAt(i);
 			TabListener listener = (TabListener)tab.getTag();
 			String tabTitle = tab.getText().toString();
-			String fragmentTag = listener.getTag();
 			Fragment fragment = listener.getFragment();
 
-			tabTitles.add(tabTitle);
-			fragmentTags.add(fragmentTag);
-			getFragmentManager().putFragment(savedInstanceState, 
-											 fragmentTag, 
-											 fragment);
+			// the fragment manager thread sometimes isn't caught up
+			try
+			{
+				Fragment.SavedState fragmentState = getFragmentManager().saveFragmentInstanceState(fragment);
+				tabTitles.add(tabTitle);
+				fragmentStates.add(fragmentState);
+			}
+			catch (Throwable t)
+			{
+				Util.toast(this, t.getMessage());
+			}
 		}
 
 		savedInstanceState.putInt("queryCounter", mQueryCounter);
 		savedInstanceState.putInt("selectedTabIndex", getActionBar().getSelectedNavigationIndex());
 		savedInstanceState.putStringArrayList("tabTitles", tabTitles);
-		savedInstanceState.putStringArrayList("fragmentTags", fragmentTags);
+		savedInstanceState.putParcelableArrayList("fragmentStates", fragmentStates);
 	}
 
 	/**
@@ -249,19 +256,17 @@ public class MainActivity extends Activity
 	 *
 	 * This method adds a new {@link TabListener} to the fragment, which
 	 * we can retrieve using {@link Fragment#getTag} (not to be confused
-	 * with the tag in the {@link FragmentManager}, which this method
-	 * accepts as a parameter).
+	 * with the tag in the {@link FragmentManager}).
 	 *
 	 * This method automatically refreshes the options menu.
 	 *
 	 * @param label The tab label/title.
-	 * @param tag The fragment tag for the {@link @FragmentManager}
 	 * @param fragment The {@link Fragment} associated with the tab.
 	 * @return The new tab.
 	 */
-	private ActionBar.Tab add_fragment_tab(String label, String tag, Fragment fragment)
+	private ActionBar.Tab add_fragment_tab(String label, Fragment fragment)
 	{
-		TabListener listener = new TabListener(this, R.id.fragment_container, tag, fragment);
+		TabListener listener = new TabListener(this, R.id.fragment_container, fragment);
 		ActionBar.Tab tab = getActionBar().newTab()
 			.setText(label)
 			.setTabListener(listener);

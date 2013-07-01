@@ -139,24 +139,6 @@ public class QueryFragment extends Fragment
 	}
 
 	/**
-	 * Lifecycle event: parent activity created.
-	 *
-	 * This is where we have to set our persistent state (for orientation
-	 * changes, etc.) using {@link #setRetainInstance(boolean)}. This
-	 * setting lets Android preserve some of the fragment's internal
-	 * state (but not its UI).
-	 *
-	 * @param savedInstanceState a bundle for saving any instance-specific
-	 * configuration.
-	 */
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState)
-	{
-		super.onActivityCreated(savedInstanceState);;
-		setRetainInstance(true);
-	}
-
-	/**
 	 * Lifecycle event: fragment needs to (re)draw its view.
 	 *
 	 * Android will set the savedInstanceState to null if it's calling
@@ -239,7 +221,7 @@ public class QueryFragment extends Fragment
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState)
 	{
-		savedInstanceState.putString(QUERY_TEXT_PROPERTY, get_query_view().getText().toString());
+		savedInstanceState.putString(QUERY_TEXT_PROPERTY, mQueryText);
 	}
 
 	/**
