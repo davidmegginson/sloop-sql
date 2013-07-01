@@ -22,24 +22,60 @@ import android.view.ViewGroup;
 public class MainActivity extends Activity
 {
 
- 	private ActionBar mActionBar;
+	//
+	// Internal state
+	//
 
+	/**
+	 * Saved pointer to the options menu
+	 */
 	private Menu mOptionsMenu;
 
+	/**
+	 * Serial counter for query tabs
+	 */
 	private int mQueryCounter = 0;
 
+
+	//
+	// Activity lifecycle methods
+	//
+
+	/**
+	 * Lifecycle event: activity first created
+	 *
+	 * If Android is creating this activity for the first time, the argument
+	 * will be null; if Android is recreating the activity, the argument
+	 * will be the activity's saved instance state.
+	 *
+	 * @param savedInstanceState The saved state, or null. 
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.main);
 
-		mActionBar = getActionBar();
-
 		// Specify that tabs should be displayed in the action bar.
-		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 	}
 
+	/**
+	 * Lifecycle event: activity finally destroyed.
+	 */
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+	}
+	
+	/**
+	 * Lifecycle event: Android wants us to save the instance state.
+	 *
+	 * @param savedInstanceState A bundle to which the activity can
+	 * optionally save its state.
+	 */
 	@Override
 	protected void onSaveInstanceState(Bundle savedInstanceState)
 	{
@@ -47,6 +83,12 @@ public class MainActivity extends Activity
 		save_tabs(savedInstanceState);
 	}
 
+	/**
+	 * Lifecycle event: Android wants us to restore the instance state.
+	 *
+	 * @param savedInstanceState A bundle from which the activity can
+	 * optionally save its state.
+	 */
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState)
 	{
@@ -54,19 +96,55 @@ public class MainActivity extends Activity
 		restore_tabs(savedInstanceState);
 	}
 
+	/**
+	 * Lifecycle event: Android is creating the options menu.
+	 *
+	 * This is where the activity can add menu items.
+	 *
+	 * @param menu The menu to which we can add items.
+	 * @return true to show the menu 
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
+		super.onCreateOptionsMenu(menu);
+		
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main_menu, menu);
+		// need to save a reference
 		mOptionsMenu = menu;
-		refresh_options_menu();
 		return true;		
 	}
+	
+	/**
+	 * Lifecycle event: post-creation prep for the options menu.
+	 *
+	 * @param menu The menu to which we can add items.
+	 * @return true to show the menu 
+	 */
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu)
+	{
+		super.onPrepareOptionsMenu(menu);
+		
+		// do this here, to avoid infinite recursion in some
+		// Android versions
+		refresh_options_menu();
 
+		return true;
+	}
+
+	/**
+	 * Lifecycle event: user has selected a menu item.
+	 *
+	 * @param item The menu item selected.
+	 * @return true if we have handled the item; false otherwise.
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
+		super.onOptionsItemSelected(item);
+		
 		// Handle item selection
 		switch (item.getItemId())
 		{
@@ -81,8 +159,13 @@ public class MainActivity extends Activity
 		}
 	}
 
+	
+	//
+	// Callbacks for actions a user has performed in the UI
+	//
+	
 	/**
-	 * Add a new query tab
+	 * Action: add a new query tab
 	 */
 	private void do_add_query_tab()
 	{
@@ -91,33 +174,34 @@ public class MainActivity extends Activity
 		tab.select();
 		mQueryCounter++;
 	}
-
-	private ActionBar.Tab add_fragment_tab(String label, String tag, Fragment fragment)
-	{
-		TabListener listener = new TabListener(this, R.id.fragment_container, tag, fragment);
-		ActionBar.Tab tab = mActionBar.newTab()
-			.setText(label)
-			.setTabListener(listener);
-		// there's no getTabListener() method, so save a copy here
-		tab.setTag(listener);
-		mActionBar.addTab(tab);
-		refresh_options_menu();
-		return tab;
-	}
-
+	
 	/**
-	 * Close the current tab.
+	 * Action: close the current tab.
 	 */
 	private void do_close_current_tab()
 	{
-		ActionBar.Tab currentTab = mActionBar.getSelectedTab();
+		ActionBar.Tab currentTab = getActionBar().getSelectedTab();
 		if (currentTab != null)
 		{
-			mActionBar.removeTab(currentTab);
+			getActionBar().removeTab(currentTab);
 		}
 		refresh_options_menu();
 	}
+	
 
+	//
+	// Internal utility methods
+	//
+
+	/**
+	 * Restore navigation tab state from a bundle.
+	 *
+	 * Android will use this information to recreate an activity after e.g.
+	 * an orientation change.
+	 *
+	 * @param savedInstanceState the bundle from which to restore the state.
+	 * @see #save_tabs(Bundle)
+	 */
 	private void restore_tabs(Bundle savedInstanceState)
 	{
 		mQueryCounter = savedInstanceState.getInt("queryCounter");
@@ -136,17 +220,32 @@ public class MainActivity extends Activity
 				add_fragment_tab(tabTitle, fragmentTag, fragment);
 			}
 		}
-		mActionBar.setSelectedNavigationItem(selectedTabIndex);
+		getActionBar().setSelectedNavigationItem(selectedTabIndex);
 	}
 
+	/**
+	 * Save navigation tab state to a bundle.
+	 *
+	 * This saved information lets us restore after e.g. an orientation
+	 * change.
+	 *
+	 * We will save the tab titles and the tags of the associated fragments, 
+	 * all of which must have called {@link Fragment#setRetainState(boolean)}
+	 * with true in their {@link Fragment#onActivityCreated} methods to tell
+	 * Android to preserve their internal state after the parent activity
+	 * terminates.
+	 *
+	 * @param savedInstanceState the bundle to which to save the state.
+	 * @see #restore_tabs(Bundle)
+	 */
 	private void save_tabs(Bundle savedInstanceState)
 	{
 		ArrayList<String> tabTitles = new ArrayList<String>();
 		ArrayList<String> fragmentTags = new ArrayList<String>();
 
-		for (int i = 0; i < mActionBar.getTabCount(); i++)
+		for (int i = 0; i < getActionBar().getTabCount(); i++)
 		{
-			ActionBar.Tab tab = mActionBar.getTabAt(i);
+			ActionBar.Tab tab = getActionBar().getTabAt(i);
 			TabListener listener = (TabListener)tab.getTag();
 			String tabTitle = tab.getText().toString();
 			String fragmentTag = listener.getTag();
@@ -160,31 +259,58 @@ public class MainActivity extends Activity
 		}
 
 		savedInstanceState.putInt("queryCounter", mQueryCounter);
-		savedInstanceState.putInt("selectedTabIndex", mActionBar.getSelectedNavigationIndex());
+		savedInstanceState.putInt("selectedTabIndex", getActionBar().getSelectedNavigationIndex());
 		savedInstanceState.putStringArrayList("tabTitles", tabTitles);
 		savedInstanceState.putStringArrayList("fragmentTags", fragmentTags);
+	}
+	
+	/**
+	 * Create and add a new action bar tab.
+	 *
+	 * This method adds a new {@link TabListener} to the fragment, which
+	 * we can retrieve using {@link Fragment#getTag} (not to be confused
+	 * with the tag in the {@link FragmentManager}, which this method
+	 * accepts as a parameter).
+	 *
+	 * This method automatically refreshes the options menu.
+	 *
+	 * @param label The tab label/title.
+	 * @param tag The fragment tag for the {@link @FragmentManager}
+	 * @param fragment The {@link Fragment} associated with the tab.
+	 * @return The new tab.
+	 */
+	private ActionBar.Tab add_fragment_tab(String label, String tag, Fragment fragment)
+	{
+		TabListener listener = new TabListener(this, R.id.fragment_container, tag, fragment);
+		ActionBar.Tab tab = getActionBar().newTab()
+			.setText(label)
+			.setTabListener(listener);
+		// there's no getTabListener() method, so save a copy here
+		tab.setTag(listener);
+		getActionBar().addTab(tab);
+		refresh_options_menu();
+		return tab;
 	}
 
 	/**
 	 * Refresh the options menu based on current tab state.
+	 *
+	 * Show the close item only if there are open tabs.
 	 */
 	private void refresh_options_menu()
 	{
 		if (mOptionsMenu != null)
 		{
 			MenuItem closeTabItem = mOptionsMenu.findItem(R.id.item_close_tab);
-			if (closeTabItem != null)
+			if (getActionBar().getTabCount() > 0)
 			{
-				if (mActionBar.getTabCount() > 0)
-				{
-					closeTabItem.setVisible(true);
-				}
-				else
-				{
-					closeTabItem.setVisible(false);
-				}
-				invalidateOptionsMenu();
+				closeTabItem.setVisible(true);
 			}
+			else
+			{
+				closeTabItem.setVisible(false);
+			}
+			invalidateOptionsMenu();
 		}
 	}
 }

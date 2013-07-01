@@ -84,7 +84,7 @@ public class QueryFragment extends Fragment
 
 
 	//
-	// Lifecycle methods
+	// Fragment lifecycle methods
 	//
 
     /** 
