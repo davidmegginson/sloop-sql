@@ -39,8 +39,6 @@ public class TabListener implements ActionBar.TabListener
 		mParentId = parentId;
 		mTag = tag;
 		mFragment = fragment;
-		
-		Util.toast(mActivity, fragment.toString() + fragment.isDetached());
 	}
 
 	/* The following are each of the ActionBar.TabListener callbacks */

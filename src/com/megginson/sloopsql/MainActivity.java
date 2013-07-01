@@ -9,10 +9,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import com.megginson.sloopsql.R;
 import java.util.ArrayList;
-import android.widget.Toast;
-import java.util.List;
-import android.os.Parcelable;
-import android.view.ViewGroup;
 
 /**
  * Main container activity for the UI.
@@ -49,22 +45,13 @@ public class MainActivity extends Activity
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		
+
 		setContentView(R.layout.main);
 
 		// Specify that tabs should be displayed in the action bar.
 		getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 	}
 
-	/**
-	 * Lifecycle event: activity finally destroyed.
-	 */
-	@Override
-	protected void onDestroy()
-	{
-		super.onDestroy();
-	}
-	
 	/**
 	 * Lifecycle event: Android wants us to save the instance state.
 	 *
@@ -103,12 +90,12 @@ public class MainActivity extends Activity
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		super.onCreateOptionsMenu(menu);
-		
+
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main_menu, menu);
 		return true;		
 	}
-	
+
 	/**
 	 * Lifecycle event: Android is preparing the options menu.
 	 *
@@ -121,13 +108,13 @@ public class MainActivity extends Activity
 	public boolean onPrepareOptionsMenu(Menu menu)
 	{
 		super.onPrepareOptionsMenu(menu);
-		
+
 		// Hide the close tab item if there are no tabs open
 		menu.findItem(R.id.item_close_tab).setVisible(getActionBar().getTabCount() > 0);
 
 		return true;		
 	}
-	
+
 	/**
 	 * Lifecycle event: user has selected a menu item.
 	 *
@@ -138,7 +125,7 @@ public class MainActivity extends Activity
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		super.onOptionsItemSelected(item);
-		
+
 		// Handle item selection
 		switch (item.getItemId())
 		{
@@ -153,11 +140,11 @@ public class MainActivity extends Activity
 		}
 	}
 
-	
+
 	//
 	// Callbacks for actions a user has performed in the UI
 	//
-	
+
 	/**
 	 * Action: add a new query tab
 	 */
@@ -168,7 +155,7 @@ public class MainActivity extends Activity
 		tab.select();
 		mQueryCounter++;
 	}
-	
+
 	/**
 	 * Action: close the current tab.
 	 */
@@ -181,7 +168,7 @@ public class MainActivity extends Activity
 			invalidateOptionsMenu();
 		}
 	}
-	
+
 
 	//
 	// Internal utility methods
@@ -210,7 +197,6 @@ public class MainActivity extends Activity
 				String tabTitle = tabTitles.get(i);
 				String fragmentTag = fragmentTags.get(i);
 				Fragment fragment = getFragmentManager().getFragment(savedInstanceState, fragmentTag);
-				Util.toast(this, fragment.toString());
 				add_fragment_tab(tabTitle, fragmentTag, fragment);
 			}
 		}
@@ -257,7 +243,7 @@ public class MainActivity extends Activity
 		savedInstanceState.putStringArrayList("tabTitles", tabTitles);
 		savedInstanceState.putStringArrayList("fragmentTags", fragmentTags);
 	}
-	
+
 	/**
 	 * Create and add a new action bar tab.
 	 *
