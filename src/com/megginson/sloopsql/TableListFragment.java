@@ -16,13 +16,6 @@ import android.widget.ListView;
 public class TableListFragment extends DialogFragment
 {
 
- 	public static  TableListFragment newInstance(SQLiteDatabase database)
-	{
-		TableListFragment fragment = new TableListFragment();
-		fragment.mDatabase = database;
-		return fragment;
-	}
-
 	//
 	// Internal fragment state
 	//
@@ -54,6 +47,8 @@ public class TableListFragment extends DialogFragment
 	public void onCreate(Bundle savedInstanceState)
 	{	
 		super.onCreate(savedInstanceState);
+		
+		mDatabase = new DatabaseHandler(getActivity()).getReadableDatabase();
 	}
 
 	/**

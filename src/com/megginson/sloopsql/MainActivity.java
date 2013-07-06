@@ -2,17 +2,17 @@ package com.megginson.sloopsql;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import com.megginson.sloopsql.R;
 import java.util.ArrayList;
-import android.os.Parcelable;
-import android.view.ViewGroup;
-import android.app.FragmentTransaction;
-import android.app.DialogFragment;
 
 /**
  * Main container activity for the UI.
@@ -25,11 +25,6 @@ public class MainActivity extends Activity
 	//
 	// Internal state
 	//
-
-	/**
-	 * SQLite database manager.
-	 */
- 	private DatabaseHandler mDatabaseHandler;
 
 	/**
 	 * Serial counter for query tabs
@@ -53,9 +48,6 @@ public class MainActivity extends Activity
 
 		// Specify that tabs should be displayed in the action bar.
 		getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-		// Create our database handler
-		mDatabaseHandler = new DatabaseHandler(this);
 	}
 
 	/**
@@ -65,13 +57,6 @@ public class MainActivity extends Activity
 	protected void onDestroy()
 	{
 		super.onDestroy();
-
-		// free any database resources
-		if (mDatabaseHandler != null)
-		{
-			mDatabaseHandler.close();
-			mDatabaseHandler = null;
-		}		
 	}
 
 	/**
@@ -158,7 +143,7 @@ public class MainActivity extends Activity
 	{
 		ActionBar.Tab tab = 
 			add_fragment_tab("Query " + (mQueryCounter + 1), 
-							 QueryFragment.newInstance(mDatabaseHandler.getReadableDatabase()));
+							 new QueryFragment());
 		tab.select();
 		mQueryCounter++;
 	}
@@ -190,7 +175,7 @@ public class MainActivity extends Activity
 		ft.addToBackStack(null);
 
 		// Create and show the dialog.
-		DialogFragment newFragment = TableListFragment.newInstance(mDatabaseHandler.getReadableDatabase());
+		DialogFragment newFragment = new TableListFragment();
 		newFragment.show(ft, "dialog");
 	}
 
@@ -226,7 +211,10 @@ public class MainActivity extends Activity
 				fragment.setInitialSavedState(fragmentState);
 				add_fragment_tab(tabTitle, fragment);
 			}
-			getActionBar().setSelectedNavigationItem(selectedTabIndex);
+			if (selectedTabIndex > -1)
+			{
+				getActionBar().setSelectedNavigationItem(selectedTabIndex);
+			}
 		}
 	}
 

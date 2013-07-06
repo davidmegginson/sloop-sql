@@ -35,20 +35,6 @@ import java.util.Set;
 public class QueryFragment extends Fragment
 {
 
-	/**
-	 * Static constructor method.
-	 *
-	 * The fragment is responsible for closing the database when it is finished with it.
-	 *
-	 * @param database The SQLite database to query.
-	 */
- 	public static QueryFragment newInstance(SQLiteDatabase database)
-	{
-		QueryFragment fragment = new QueryFragment();
-		fragment.mDatabase = database;
-		return fragment;
-	}
-
     //
 	// Constants
 	//
@@ -111,6 +97,8 @@ public class QueryFragment extends Fragment
 		{
 			mQueryText = savedInstanceState.getString(QUERY_TEXT_PROPERTY);
 		}
+		
+		mDatabase = new DatabaseHandler(getActivity()).getReadableDatabase();
     }
 
 	/**
