@@ -48,6 +48,17 @@ public class QueryFragment extends Fragment
 	 * Property name for saved SQL query.
 	 */
 	public final static String QUERY_TEXT_PROPERTY = "queryText";
+	
+	
+	/**
+	 * Static constructor
+	 */
+	public final static QueryFragment newInstance(String queryText)
+	{
+		QueryFragment fragment =new QueryFragment();
+		fragment.mQueryText = queryText;
+		return fragment;
+	}
 
 
 	//

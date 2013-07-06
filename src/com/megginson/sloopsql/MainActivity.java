@@ -118,7 +118,7 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 		switch (item.getItemId())
 		{
 			case R.id.item_add_query:
-				do_add_query_tab();
+				do_add_query_tab(null, null);
 				return true;
 			case R.id.item_close_tab:
 				do_close_current_tab();
@@ -141,7 +141,7 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 	@Override
 	public void onTableSelected(String tableName)
 	{
-		Util.toast(this, tableName);
+		do_add_query_tab(tableName, "select * from " + tableName);
 	}
 
 
@@ -152,11 +152,14 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 	/**
 	 * Action: add a new query tab
 	 */
-	private void do_add_query_tab()
+	private void do_add_query_tab(String title, String queryText)
 	{
+		if (title == null)
+		{
+			title = "Query " + (mQueryCounter + 1);
+		}
 		ActionBar.Tab tab = 
-			add_fragment_tab("Query " + (mQueryCounter + 1), 
-							 new QueryFragment());
+			add_fragment_tab(title, QueryFragment.newInstance(queryText));
 		tab.select();
 		mQueryCounter++;
 	}
