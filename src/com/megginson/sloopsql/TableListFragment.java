@@ -47,7 +47,7 @@ public class TableListFragment extends DialogFragment
 	public void onCreate(Bundle savedInstanceState)
 	{	
 		super.onCreate(savedInstanceState);
-		
+
 		mDatabase = new DatabaseHandler(getActivity()).getReadableDatabase();
 	}
 
@@ -82,12 +82,12 @@ public class TableListFragment extends DialogFragment
 		setup_ui();
 		return mFragmentView;
 	}
-	
+
 	@Override
 	public void onResume()
 	{
 		super.onResume();
-		
+
 		// Generate a list of tables
 		do_list_tables();
 	}
@@ -112,17 +112,17 @@ public class TableListFragment extends DialogFragment
 			Util.toast(getActivity(), t.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Select a table.
 	 */
-	 private void do_select_table_row(int position)
-	 {
-		 mCursor.moveToPosition(position);
-		 String tableName = mCursor.getString(mCursor.getColumnIndex("name"));
-		 Util.toast(getActivity(), "Select table " + tableName);
-		 dismiss();
-	 }
+	private void do_select_table_row(int position)
+	{
+		mCursor.moveToPosition(position);
+		String tableName = mCursor.getString(mCursor.getColumnIndex("name"));
+		((Listener)getActivity()).onTableSelected(tableName);
+		dismiss();
+	}
 
 
 	//
@@ -136,11 +136,11 @@ public class TableListFragment extends DialogFragment
 	{
 		getDialog().setTitle(R.string.title_table_list);
 		get_list_view().setOnItemClickListener(new ListView.OnItemClickListener() {
-			public void onItemClick(AdapterView parent, View view, int position, long id)
-			{
-				do_select_table_row(position);
-			}
-		});
+				public void onItemClick(AdapterView parent, View view, int position, long id)
+				{
+					do_select_table_row(position);
+				}
+			});
 	}
 
 	/**
@@ -150,12 +150,18 @@ public class TableListFragment extends DialogFragment
 	{
 		return (ListView)mFragmentView.findViewById(R.id.table_list);
 	}
-	
+
 	/**
 	 * Callback listener for the activity to implement.
 	 */
 	interface Listener
 	{	
+
+		/**
+		 * Called when the user selects a table and closes the dialog.
+		 *
+		 * The parent activity must implement this interface.
+		 */
 		public void onTableSelected(String tableName);
 	}
 

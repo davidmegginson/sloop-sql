@@ -19,7 +19,7 @@ import java.util.ArrayList;
  *
  * This activity manages the various fragments that make up the app.
  */
-public class MainActivity extends Activity
+public class MainActivity extends Activity implements TableListFragment.Listener
 {
 
 	//
@@ -129,6 +129,19 @@ public class MainActivity extends Activity
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+
+	//
+	// Listener callbacks for fragments.
+	//
+
+	/**
+	 * The user has selected a table in the table list dialog.
+	 */
+	@Override
+	public void onTableSelected(String tableName)
+	{
+		Util.toast(this, tableName);
 	}
 
 
