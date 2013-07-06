@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 /**
@@ -105,13 +105,22 @@ public class TableListFragment extends DialogFragment
 		try
 		{
 			mCursor = mDatabase.rawQuery("select type, name from sqlite_master where type in ('table', 'view')", null);
-			get_list_view().setAdapter(new QueryResultAdapter(mCursor));
+			get_list_view().setAdapter(new TableListAdapter(mCursor));
 		}
 		catch (Throwable t)
 		{
 			Util.toast(getActivity(), t.getMessage());
 		}
 	}
+	
+	/**
+	 * Select a table.
+	 */
+	 private void do_select_table_row(int position)
+	 {
+		 Util.toast(getActivity(), "Select table @ " + position);
+		 dismiss();
+	 }
 
 
 	//
@@ -124,6 +133,12 @@ public class TableListFragment extends DialogFragment
 	private void setup_ui()
 	{
 		getDialog().setTitle(R.string.title_table_list);
+		get_list_view().setOnItemClickListener(new ListView.OnItemClickListener() {
+			public void onItemClick(AdapterView parent, View view, int position, long id)
+			{
+				do_select_table_row(position);
+			}
+		});
 	}
 
 	/**
