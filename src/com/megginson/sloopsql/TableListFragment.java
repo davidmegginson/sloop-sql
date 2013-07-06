@@ -118,7 +118,9 @@ public class TableListFragment extends DialogFragment
 	 */
 	 private void do_select_table_row(int position)
 	 {
-		 Util.toast(getActivity(), "Select table @ " + position);
+		 mCursor.moveToPosition(position);
+		 String tableName = mCursor.getString(mCursor.getColumnIndex("name"));
+		 Util.toast(getActivity(), "Select table " + tableName);
 		 dismiss();
 	 }
 
@@ -147,6 +149,14 @@ public class TableListFragment extends DialogFragment
 	private ListView get_list_view()
 	{
 		return (ListView)mFragmentView.findViewById(R.id.table_list);
+	}
+	
+	/**
+	 * Callback listener for the activity to implement.
+	 */
+	interface Listener
+	{	
+		public void onTableSelected(String tableName);
 	}
 
 }
