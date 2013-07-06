@@ -34,6 +34,11 @@ import java.util.Set;
  */
 public class QueryFragment extends Fragment
 {
+ 
+ 	public static QueryFragment newInstance()
+	{
+		return new QueryFragment();
+	}
 
     //
 	// Constants
@@ -89,12 +94,6 @@ public class QueryFragment extends Fragment
 
     /** 
 	 * Lifecycle event: fragment first created.
-	 *
-	 * The argument contains the saved state if Android is restoring
-	 * a previously-existing version of this fragment, or null if it's
-	 * creating the fragment from scratch.
-	 *
-	 * @param savedInstance the fragment's saved state, or null. 
 	 */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -113,13 +112,13 @@ public class QueryFragment extends Fragment
 
 	/**
 	 * Lifecycle event: fragment destroyed.
-	 *
-	 * Free up any database resources we're using.
 	 */
 	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
+
+		// free resources
 
 		if (mCursor != null)
 		{
@@ -139,22 +138,7 @@ public class QueryFragment extends Fragment
 	}
 
 	/**
-	 * Lifecycle event: fragment needs to (re)draw its view.
-	 *
-	 * Android will set the savedInstanceState to null if it's calling
-	 * this method right after {@link #onCreate(Bundle)}, or if it's
-	 * redrawing a fragment that has set itself to persistent using
-	 * {@link #setRetainInstance(boolean)}. After e.g. orientation
-	 * change, Android can ask the fragment to redraw itself, and if
-	 * the saved state is null, it's up to the fragment to repopulate
-	 * its UI components from internal state.
-	 *
-	 * @param inflater The parent activity's inflater, for building
-	 * the layout from XML resource files.
-	 * @param container The parent activity's {@link ViewGroup} that
-	 * will hold the fragment.
-	 * @param savedInstance the fragment's saved state, or null. 
-	 * @return The root of the fragment's UI.
+	 * Lifecycle event: fragment creates or recreates its view.
 	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -168,9 +152,6 @@ public class QueryFragment extends Fragment
 
 	/**
 	 * Lifecycle event: fragment is resuming (or starting for first time).
-	 *
-	 * This is where we read our permanent (non-instance-specific)
-	 * configuration from saved preferences.
 	 */
 	@Override
 	public void onResume()
@@ -195,9 +176,6 @@ public class QueryFragment extends Fragment
 
 	/**
 	 * Lifecycle event: fragment is pausing (maybe permanently).
-	 *
-	 * This is where we save our permanent (non-instance-specific)
-	 * configuration in shared preferences.
 	 */
 	@Override
 	public void onPause()
@@ -211,12 +189,6 @@ public class QueryFragment extends Fragment
 
 	/**
 	 * Lifecycle event: Android wants us to save the instance state.
-	 *
-	 * Android might use the state to create a new copy of the fragment
-	 * later.
-	 *
-	 * @param savedInstanceState a bundle where we can save the
-	 * fragment's current temporary (instance-specific) state.
 	 */
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState)
@@ -226,12 +198,6 @@ public class QueryFragment extends Fragment
 
 	/**
 	 * Lifecycle event: Android is creating the options menu.
-	 *
-	 * This is where the fragment has the chance to contribute
-	 * extra items.
-	 *
-	 * @param menu The menu to which we can add items.
-	 * @param inflator An inflator for XML-based menu resources.
 	 */
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
@@ -241,11 +207,6 @@ public class QueryFragment extends Fragment
 
 	/**
 	 * Lifecycle event: the user has selected a menu item.
-	 *
-	 * We have an opportunity to intercept it.
-	 *
-	 * @param item The menu item selected.
-	 * @return true if we have handled the item; false otherwise.
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
@@ -339,7 +300,7 @@ public class QueryFragment extends Fragment
 
 
 	//
-	// UI functions
+	// UI methods
 	//
 	// (It's not safe to store references to UI components directly
 	// in variables, since the fragment's state can outlast UI

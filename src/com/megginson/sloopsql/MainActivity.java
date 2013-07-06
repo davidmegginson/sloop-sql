@@ -157,7 +157,7 @@ public class MainActivity extends Activity
 	 */
 	private void do_add_query_tab()
 	{
-		ActionBar.Tab tab = add_fragment_tab("Query " + (mQueryCounter + 1), new QueryFragment());
+		ActionBar.Tab tab = add_fragment_tab("Query " + (mQueryCounter + 1), QueryFragment.newInstance());
 		tab.select();
 		mQueryCounter++;
 	}
@@ -188,7 +188,7 @@ public class MainActivity extends Activity
 		ft.addToBackStack(null);
 
 		// Create and show the dialog.
-		DialogFragment newFragment = new TableListFragment();
+		DialogFragment newFragment = TableListFragment.newInstance();
 		newFragment.show(ft, "dialog");
 	}
 
