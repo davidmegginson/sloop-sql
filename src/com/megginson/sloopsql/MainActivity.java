@@ -27,6 +27,11 @@ public class MainActivity extends Activity
 	//
 
 	/**
+	 * SQLite database manager.
+	 */
+ 	private DatabaseHandler mDatabaseHandler;
+
+	/**
 	 * Serial counter for query tabs
 	 */
 	private int mQueryCounter = 0;
@@ -38,12 +43,6 @@ public class MainActivity extends Activity
 
 	/**
 	 * Lifecycle event: activity first created
-	 *
-	 * If Android is creating this activity for the first time, the argument
-	 * will be null; if Android is recreating the activity, the argument
-	 * will be the activity's saved instance state.
-	 *
-	 * @param savedInstanceState The saved state, or null. 
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -54,13 +53,29 @@ public class MainActivity extends Activity
 
 		// Specify that tabs should be displayed in the action bar.
 		getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+		// Create our database handler
+		mDatabaseHandler = new DatabaseHandler(this);
+	}
+	
+	/**
+	 * Lifecycle event: activity finally destroyed.
+	 */
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+		
+		// free any database resources
+		if (mDatabaseHandler != null)
+		{
+			mDatabaseHandler.close();
+			mDatabaseHandler = null;
+		}		
 	}
 
 	/**
 	 * Lifecycle event: Android wants us to save the instance state.
-	 *
-	 * @param savedInstanceState A bundle to which the activity can
-	 * optionally save its state.
 	 */
 	@Override
 	protected void onSaveInstanceState(Bundle savedInstanceState)
@@ -71,9 +86,6 @@ public class MainActivity extends Activity
 
 	/**
 	 * Lifecycle event: Android wants us to restore the instance state.
-	 *
-	 * @param savedInstanceState A bundle from which the activity can
-	 * optionally save its state.
 	 */
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState)
@@ -84,11 +96,6 @@ public class MainActivity extends Activity
 
 	/**
 	 * Lifecycle event: Android is creating the options menu.
-	 *
-	 * This is where the activity can add menu items.
-	 *
-	 * @param menu The menu to which we can add items.
-	 * @return true to show the menu 
 	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -102,11 +109,6 @@ public class MainActivity extends Activity
 
 	/**
 	 * Lifecycle event: Android is preparing the options menu.
-	 *
-	 * This is where the activity can do extra config for menu items.
-	 *
-	 * @param menu The menu which we can configure.
-	 * @return true to show the menu 
 	 */
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)
@@ -121,9 +123,6 @@ public class MainActivity extends Activity
 
 	/**
 	 * Lifecycle event: user has selected a menu item.
-	 *
-	 * @param item The menu item selected.
-	 * @return true if we have handled the item; false otherwise.
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
@@ -174,7 +173,7 @@ public class MainActivity extends Activity
 			invalidateOptionsMenu();
 		}
 	}
-	
+
 	/**
 	 * Action: list tables in this database.
 	 */
@@ -182,7 +181,8 @@ public class MainActivity extends Activity
 	{
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
 		Fragment prev = getFragmentManager().findFragmentByTag("dialog");
-		if (prev != null) {
+		if (prev != null)
+		{
 			ft.remove(prev);
 		}
 		ft.addToBackStack(null);
