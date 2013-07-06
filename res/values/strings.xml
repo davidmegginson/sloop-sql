@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="hello">Welcome to SloopSQL!</string>
     <string name="app_name">SloopSQL</string>
 	<string name="message_query_result">Returned %1$d row(s)</string>
@@ -9,6 +8,7 @@
 	<string name="label_clear_history">Clear history</string>
 	<string name="label_share">Share</string>
 	<string name="message_history_cleared">History cleared</string>
+	<string name="title_table_list">Database tables</string>
 	<string name="label_add_query">New query</string>
 	<string name="label_close_tab">Close tab</string>
 	<string name="label_list_tables">List tables</string>

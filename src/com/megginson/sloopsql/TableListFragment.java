@@ -1,6 +1,7 @@
 package com.megginson.sloopsql;
 
 import android.app.DialogFragment;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,7 +15,7 @@ import android.widget.ListView;
  */
 public class TableListFragment extends DialogFragment
 {
- 
+
  	public static  TableListFragment newInstance(SQLiteDatabase database)
 	{
 		TableListFragment fragment = new TableListFragment();
@@ -30,11 +31,16 @@ public class TableListFragment extends DialogFragment
 	 * The fragment's root view. set in {@link #onCreateView}
 	 */
  	private ViewGroup mFragmentView;
-	
+
 	/**
 	 * The database to query.
 	 */
 	private SQLiteDatabase mDatabase;
+
+	/**
+	 * Any existing query result.
+	 */
+	private Cursor mCursor;
 
 
 	//
@@ -57,7 +63,13 @@ public class TableListFragment extends DialogFragment
 	public void onDestroy()
 	{
 		super.onDestroy();
-		
+
+		if (mCursor != null)
+		{
+			mCursor.close();
+			mCursor = null;
+		}
+
 		if (mDatabase != null)
 		{
 			mDatabase.close();
@@ -75,6 +87,36 @@ public class TableListFragment extends DialogFragment
 		setup_ui();
 		return mFragmentView;
 	}
+	
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		
+		// Generate a list of tables
+		do_list_tables();
+	}
+
+
+	//
+	// Actions
+	//
+
+	/**
+	 * Show a list of tables and views.
+	 */
+	private void do_list_tables()
+	{
+		try
+		{
+			mCursor = mDatabase.rawQuery("select type, name from sqlite_master where type in ('table', 'view')", null);
+			get_list_view().setAdapter(new QueryResultAdapter(mCursor));
+		}
+		catch (Throwable t)
+		{
+			Util.toast(getActivity(), t.getMessage());
+		}
+	}
 
 
 	//
@@ -86,18 +128,13 @@ public class TableListFragment extends DialogFragment
 	 */
 	private void setup_ui()
 	{
-		String items[] = {
-			"a", "b", "c"
-		};
-		
-		ListView tableList = get_list_view();
-		tableList.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.cell, items));
+		getDialog().setTitle(R.string.title_table_list);
 	}
 
 	/**
 	 * Get the table list view.
 	 */
-	ListView get_list_view()
+	private ListView get_list_view()
 	{
 		return (ListView)mFragmentView.findViewById(R.id.table_list);
 	}
