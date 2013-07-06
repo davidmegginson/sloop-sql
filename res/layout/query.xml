@@ -17,7 +17,9 @@
 			android:layout_height="wrap_content"
 			android:paddingRight="32dp"
 			android:layout_weight="1"
-			android:hint="@string/hint_query" />
+			android:hint="@string/hint_query">
+			<requestFocus/>
+		</AutoCompleteTextView>
 		
 		<ImageButton
 			android:id="@+id/button_clear"

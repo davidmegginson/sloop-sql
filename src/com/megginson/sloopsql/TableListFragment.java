@@ -1,12 +1,13 @@
 package com.megginson.sloopsql;
 
 import android.app.DialogFragment;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 /**
  * Dialog fragment to display a list of tables.
@@ -14,9 +15,11 @@ import android.widget.ArrayAdapter;
 public class TableListFragment extends DialogFragment
 {
  
- 	public static  TableListFragment newInstance()
+ 	public static  TableListFragment newInstance(SQLiteDatabase database)
 	{
-		return new TableListFragment();
+		TableListFragment fragment = new TableListFragment();
+		fragment.mDatabase = database;
+		return fragment;
 	}
 
 	//
@@ -27,6 +30,11 @@ public class TableListFragment extends DialogFragment
 	 * The fragment's root view. set in {@link #onCreateView}
 	 */
  	private ViewGroup mFragmentView;
+	
+	/**
+	 * The database to query.
+	 */
+	private SQLiteDatabase mDatabase;
 
 
 	//
@@ -49,6 +57,12 @@ public class TableListFragment extends DialogFragment
 	public void onDestroy()
 	{
 		super.onDestroy();
+		
+		if (mDatabase != null)
+		{
+			mDatabase.close();
+			mDatabase = null;
+		}
 	}
 
 	/**

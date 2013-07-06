@@ -57,7 +57,7 @@ public class MainActivity extends Activity
 		// Create our database handler
 		mDatabaseHandler = new DatabaseHandler(this);
 	}
-	
+
 	/**
 	 * Lifecycle event: activity finally destroyed.
 	 */
@@ -65,7 +65,7 @@ public class MainActivity extends Activity
 	protected void onDestroy()
 	{
 		super.onDestroy();
-		
+
 		// free any database resources
 		if (mDatabaseHandler != null)
 		{
@@ -156,7 +156,9 @@ public class MainActivity extends Activity
 	 */
 	private void do_add_query_tab()
 	{
-		ActionBar.Tab tab = add_fragment_tab("Query " + (mQueryCounter + 1), QueryFragment.newInstance());
+		ActionBar.Tab tab = 
+			add_fragment_tab("Query " + (mQueryCounter + 1), 
+							 QueryFragment.newInstance(mDatabaseHandler.getReadableDatabase()));
 		tab.select();
 		mQueryCounter++;
 	}
@@ -188,7 +190,7 @@ public class MainActivity extends Activity
 		ft.addToBackStack(null);
 
 		// Create and show the dialog.
-		DialogFragment newFragment = TableListFragment.newInstance();
+		DialogFragment newFragment = TableListFragment.newInstance(mDatabaseHandler.getReadableDatabase());
 		newFragment.show(ft, "dialog");
 	}
 

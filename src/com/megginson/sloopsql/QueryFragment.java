@@ -34,16 +34,25 @@ import java.util.Set;
  */
 public class QueryFragment extends Fragment
 {
- 
- 	public static QueryFragment newInstance()
+
+	/**
+	 * Static constructor method.
+	 *
+	 * The fragment is responsible for closing the database when it is finished with it.
+	 *
+	 * @param database The SQLite database to query.
+	 */
+ 	public static QueryFragment newInstance(SQLiteDatabase database)
 	{
-		return new QueryFragment();
+		QueryFragment fragment = new QueryFragment();
+		fragment.mDatabase = database;
+		return fragment;
 	}
 
     //
 	// Constants
 	//
-	
+
 	/**
 	 * Property name for saved history.
 	 */
@@ -53,8 +62,8 @@ public class QueryFragment extends Fragment
 	 * Property name for saved SQL query.
 	 */
 	public final static String QUERY_TEXT_PROPERTY = "queryText";
-	
-	
+
+
 	//
 	// Internal fragment state
 	//
@@ -63,9 +72,6 @@ public class QueryFragment extends Fragment
 	 * The fragment's root view. set in {@link #onCreateView}
 	 */
 	private View mFragmentView;
-
-	// TODO move to parent or application level
- 	private DatabaseHandler mDatabaseHandler;
 
 	/**
 	 * The database we're currently querying.
@@ -101,9 +107,6 @@ public class QueryFragment extends Fragment
         super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
 
-		mDatabaseHandler = new DatabaseHandler(getActivity());
-		mDatabase = mDatabaseHandler.getWritableDatabase();
-
 		if (savedInstanceState != null)
 		{
 			mQueryText = savedInstanceState.getString(QUERY_TEXT_PROPERTY);
@@ -129,11 +132,6 @@ public class QueryFragment extends Fragment
 		{
 			mDatabase.close();
 			mDatabase = null;
-		}
-		if (mDatabaseHandler != null)
-		{
-			mDatabaseHandler.close();
-			mDatabaseHandler = null;
 		}
 	}
 
@@ -417,7 +415,7 @@ public class QueryFragment extends Fragment
 		 */
 		private String mQueryText;
 
-		
+
 		/**
 		 * Run the SQL query
 		 *
@@ -475,7 +473,7 @@ public class QueryFragment extends Fragment
 				return;
 			}
 			set_cursor(cursor);
-			
+
 			// It succeeded, so add to query history.
 			update_query_history(mQueryText);
 
