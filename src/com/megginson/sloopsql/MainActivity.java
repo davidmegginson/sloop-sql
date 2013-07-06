@@ -11,6 +11,8 @@ import com.megginson.sloopsql.R;
 import java.util.ArrayList;
 import android.os.Parcelable;
 import android.view.ViewGroup;
+import android.app.FragmentTransaction;
+import android.app.DialogFragment;
 
 /**
  * Main container activity for the UI.
@@ -137,6 +139,9 @@ public class MainActivity extends Activity
 			case R.id.item_close_tab:
 				do_close_current_tab();
 				return true;
+			case R.id.item_list_tables:
+				do_list_tables();
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -168,6 +173,23 @@ public class MainActivity extends Activity
 			getActionBar().removeTab(currentTab);
 			invalidateOptionsMenu();
 		}
+	}
+	
+	/**
+	 * Action: list tables in this database.
+	 */
+	private void do_list_tables()
+	{
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+		if (prev != null) {
+			ft.remove(prev);
+		}
+		ft.addToBackStack(null);
+
+		// Create and show the dialog.
+		DialogFragment newFragment = new TableListFragment();
+		newFragment.show(ft, "dialog");
 	}
 
 

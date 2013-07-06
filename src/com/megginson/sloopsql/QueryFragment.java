@@ -529,7 +529,7 @@ public class QueryFragment extends Fragment
 			{
 				for (int i = 0; i < mCursor.getColumnCount(); i++)
 				{
-					TextView header = (TextView)Util.inflate(headerView.getContext(), R.layout.table_header);
+					TextView header = (TextView)Util.inflate(headerView.getContext(), R.layout.header);
 					header.setText(mCursor.getColumnName(i));
 					headerView.addView(header);
 				}	

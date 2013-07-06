@@ -72,7 +72,7 @@ public class QueryResultAdapter extends BaseAdapter implements ListAdapter
 		LinearLayout layout = new LinearLayout(context);
 		for (int i = 0; i < mCursor.getColumnCount(); i++)
 		{
-			layout.addView(Util.inflate(context, R.layout.table_cell));
+			layout.addView(Util.inflate(context, R.layout.cell));
 		}
 		return layout;
 	}
