@@ -9,7 +9,8 @@
 		android:id="@+id/layout_query"
 		android:layout_height="wrap_content"
 		android:layout_width="fill_parent"
-		android:orientation="horizontal">
+		android:orientation="horizontal"
+		android:gravity="center_vertical">
 		
 		<AutoCompleteTextView
 			android:id="@+id/input_query"
@@ -23,12 +24,12 @@
 		
 		<ImageButton
 			android:id="@+id/button_clear"
-			android:layout_width="48dp"
-			android:layout_height="match_parent"
-			android:layout_marginLeft="-48dp"
-			android:layout_alignParentTop="true"
+			android:layout_width="12dp"
+			android:layout_height="12dp"
+			android:layout_marginLeft="-24dp"
+			android:layout_marginRight="12dp"
 			android:background="@android:color/transparent"
-			android:src="@android:drawable/ic_input_delete"
+			android:src="@drawable/ic_cancel_dark"
 			/>
 
 	</LinearLayout>

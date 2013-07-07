@@ -3,13 +3,13 @@
     <item
         android:id="@+id/item_add_query"
         android:title="@string/label_add_query"
-		android:icon="@drawable/ic_new_dark"
+		android:icon="@android:drawable/ic_input_add"
 		android:showAsAction="ifRoom" />
     
 	<item
         android:id="@+id/item_close_tab"
         android:title="@string/label_close_tab"
-		android:icon="@drawable/ic_cancel_dark"
+		android:icon="@android:drawable/ic_delete"
 		android:showAsAction="ifRoom" />
 	
 	<item
