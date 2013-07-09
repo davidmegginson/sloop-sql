@@ -12,6 +12,7 @@
 	<string name="label_add">Add</string>
 	<string name="label_add_query">New query</string>
 	<string name="label_add_script">New script</string>
+	<string name="label_execute_script">Execute script</string>
 	<string name="label_close_tab">Close tab</string>
 	<string name="label_list_tables">List tables</string>
 </resources>

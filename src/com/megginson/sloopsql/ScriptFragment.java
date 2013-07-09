@@ -134,7 +134,7 @@ public class ScriptFragment extends Fragment
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
-//		inflater.inflate(R.menu.script_menu, menu);
+		inflater.inflate(R.menu.script_menu, menu);
 	}
 
 	/**
@@ -146,6 +146,9 @@ public class ScriptFragment extends Fragment
 		// Handle item selection
 		switch (item.getItemId())
 		{
+			case R.id.item_execute_script:
+				do_execute_script();
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -187,21 +190,6 @@ public class ScriptFragment extends Fragment
 	{
 		EditText scriptView = get_script_view();
 		scriptView.setText(mScriptText);
-		scriptView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-				@Override
-				public boolean onEditorAction(TextView view, int actionId, KeyEvent event)
-				{
-					if (actionId == EditorInfo.IME_NULL)
-					{
-						do_execute_script();
-						return true;
-					}
-					else
-					{
-						return false;
-					}
-				}
-			});
 	}
 
 	/**

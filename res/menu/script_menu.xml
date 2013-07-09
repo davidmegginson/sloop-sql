@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<item
+        android:id="@+id/item_execute_script"
+        android:title="@string/label_execute_script"
+		android:icon="@drawable/ic_play_dark"
+		android:showAsAction="ifRoom"/>
+
+	<item
+		android:id="@+id/item_share"
+		android:title="@string/label_share"
+		android:icon="@drawable/ic_share_dark"
+		android:showAsAction="ifRoom" />
+
+</menu>
