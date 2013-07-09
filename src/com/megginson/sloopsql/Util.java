@@ -105,7 +105,7 @@ public final class Util
 		if (s.length() > 0)
 		{
 			statementList.add(s);
-		}	
+		}
 
 		return statementList;
 	}

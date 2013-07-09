@@ -172,7 +172,12 @@ public class ScriptFragment extends Fragment
 
 		if (mScriptText != null && mScriptText.length() > 0)
 		{
-			new QueryTask().execute(Util.splitSQL(mScriptText).toArray(new String[0]));
+			String statements[] = Util.splitSQL(mScriptText).toArray(new String[0]);
+			if (statements.length > 0)
+			{
+				new QueryTask().execute(statements);
+				return;
+			}
 		}
 	}
 
@@ -293,7 +298,7 @@ public class ScriptFragment extends Fragment
 			messageView.setText(String.format(getString(R.string.message_query_result), cursor.getCount()));
 			cursor.close();	
 		}
-		
+
 	}
 
 }
