@@ -59,14 +59,12 @@ public final class Util
 		return s.toString();
 	}
 
+	/**
+	 * Split a string into multiple SQL statements using ";" as a separator.
+	 */
 	public static List<String> splitSQL(String statementsText)
 	{
 		List<String> statementList = new ArrayList<String>();
-		return splitSQL(statementsText, statementList);
-	}
-
-	private static List<String> splitSQL(String statementsText, List<String>statementList)
-	{
 		StringBuffer statement = new StringBuffer();
 
 		for (int i = 0; i < statementsText.length(); i++)
@@ -75,9 +73,10 @@ public final class Util
 			switch (c)
 			{
 				case ';':
-					if (statement.length() > 0)
+					String s = statement.toString().trim();
+					if (s.length() > 0)
 					{
-						statementList.add(statement.toString());
+						statementList.add(s.toString());
 						statement.setLength(0);
 					}
 					break;
@@ -102,9 +101,10 @@ public final class Util
 		}
 
 		// straggler without a semicolon?
-		if (statement.length() > 0)
+		String s = statement.toString().trim();
+		if (s.length() > 0)
 		{
-			statementList.add(statement.toString());
+			statementList.add(s);
 		}	
 
 		return statementList;
