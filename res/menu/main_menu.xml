@@ -1,5 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     
+	<item
+		android:id="@+id/item_list_tables"
+		android:title="@string/label_list_tables"
+		android:icon="@drawable/ic_collection_dark"
+		android:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/item_add_query"
         android:title="@string/label_add_query"
@@ -10,12 +16,6 @@
         android:id="@+id/item_close_tab"
         android:title="@string/label_close_tab"
 		android:icon="@android:drawable/ic_delete"
-		android:showAsAction="ifRoom" />
-	
-	<item
-		android:id="@+id/item_list_tables"
-		android:title="@string/label_list_tables"
-		android:icon="@drawable/ic_collection_dark"
 		android:showAsAction="ifRoom" />
 	
 </menu>
