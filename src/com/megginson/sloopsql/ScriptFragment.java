@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.megginson.sloopsql.R;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Activity for executing SQL queries.
@@ -171,7 +172,7 @@ public class ScriptFragment extends Fragment
 
 		if (mScriptText != null && mScriptText.length() > 0)
 		{
-			new QueryTask().execute(mScriptText);
+			new QueryTask().execute(Util.splitSQL(mScriptText).toArray(new String[0]));
 		}
 	}
 
@@ -193,11 +194,11 @@ public class ScriptFragment extends Fragment
 	}
 
 	/**
-	 * Get the query field from the UI.
+	 * Get the script edit view from the UI.
 	 *
-	 * This is the view that holds the SQL text for our query.
+	 * This is the view that holds the SQL text for our script.
 	 *
-	 * @return the query view, or null if the UI isn't set up.
+	 * @return the script view, or null if the UI isn't set up.
 	 */
 	private EditText get_script_view()
 	{
@@ -291,8 +292,8 @@ public class ScriptFragment extends Fragment
 			// Set up the message view.
 			messageView.setText(String.format(getString(R.string.message_query_result), cursor.getCount()));
 			cursor.close();	
-	}
-
+		}
+		
 	}
 
 }

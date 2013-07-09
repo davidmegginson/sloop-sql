@@ -5,6 +5,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.content.Context;
 import android.widget.Toast;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Static utility methods for the application.
@@ -25,7 +27,7 @@ public final class Util
 		LayoutInflater inflater = LayoutInflater.from(context);
 		return inflater.inflate(id, null);
 	}
-	
+
 	/**
 	 * Show a long toast pop-up message.
 	 *
@@ -36,7 +38,7 @@ public final class Util
 	{
 		Toast.makeText(context, message, Toast.LENGTH_LONG).show();
 	}
-	
+
 	/**
 	 * Construct a stacktrace string from a throwable.
 	 *
@@ -55,6 +57,57 @@ public final class Util
 			s.append(e.toString());
 		}
 		return s.toString();
+	}
+
+	public static List<String> splitSQL(String statementsText)
+	{
+		List<String> statementList = new ArrayList<String>();
+		return splitSQL(statementsText, statementList);
+	}
+
+	private static List<String> splitSQL(String statementsText, List<String>statementList)
+	{
+		StringBuffer statement = new StringBuffer();
+
+		for (int i = 0; i < statementsText.length(); i++)
+		{
+			char c = statementsText.charAt(i);
+			switch (c)
+			{
+				case ';':
+					if (statement.length() > 0)
+					{
+						statementList.add(statement.toString());
+						statement.setLength(0);
+					}
+					break;
+				case '\'':
+				case '"':
+				case '`':
+					statement.append(c);
+					while (++i < statementsText.length())
+					{
+						char c1 = statementsText.charAt(i);
+						statement.append(c1);
+						if (c == c1)
+						{
+							break;
+						}
+					}
+					break;
+				default:
+					statement.append(c);
+					break;
+			}
+		}
+
+		// straggler without a semicolon?
+		if (statement.length() > 0)
+		{
+			statementList.add(statement.toString());
+		}	
+
+		return statementList;
 	}
 
 }
