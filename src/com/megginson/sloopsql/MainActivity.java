@@ -31,7 +31,12 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 	 */
 	private int mQueryCounter = 0;
 
+	/**
+	 * Serial counter for query tabs
+	 */
+	private int mScriptCounter = 0;
 
+	
 	//
 	// Activity lifecycle methods
 	//
@@ -120,6 +125,9 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 			case R.id.item_add_query:
 				do_add_query_tab(null, null);
 				return true;
+			case R.id.item_add_script:
+				do_add_script_tab(null, null);
+				return true;
 			case R.id.item_close_tab:
 				do_close_current_tab();
 				return true;
@@ -160,6 +168,21 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 		}
 		ActionBar.Tab tab = 
 			add_fragment_tab(title, QueryFragment.newInstance(queryText));
+		tab.select();
+		mQueryCounter++;
+	}
+	
+	/**
+	 * Action: add a new query tab
+	 */
+	private void do_add_script_tab(String title, String scriptText)
+	{
+		if (title == null)
+		{
+			title = "Script " + (mScriptCounter + 1);
+		}
+		ActionBar.Tab tab = 
+			add_fragment_tab(title, ScriptFragment.newInstance(scriptText));
 		tab.select();
 		mQueryCounter++;
 	}
