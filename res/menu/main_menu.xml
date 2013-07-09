@@ -7,10 +7,18 @@
 		android:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/item_add_query"
-        android:title="@string/label_add_query"
+        android:title="@string/label_add"
 		android:icon="@android:drawable/ic_input_add"
-		android:showAsAction="ifRoom" />
+		android:showAsAction="ifRoom">
+		<menu>
+			<item
+				android:id="@+id/item_add_query"
+				android:title="@string/label_add_query"/>
+			<item
+				android:id="@+id/item_add_script"
+				android:title="@string/label_add_script"/>
+		</menu>
+	</item>
     
 	<item
         android:id="@+id/item_close_tab"
