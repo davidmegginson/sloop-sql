@@ -22,6 +22,10 @@ import java.util.ArrayList;
 public class MainActivity extends Activity implements TableListFragment.Listener
 {
 
+ 	public final static int TAB_TYPE_QUERY = 1;
+
+	public final static int TAB_TYPE_SCRIPT = 2;
+
 	//
 	// Internal state
 	//
@@ -36,7 +40,7 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 	 */
 	private int mScriptCounter = 0;
 
-	
+
 	//
 	// Activity lifecycle methods
 	//
@@ -171,7 +175,7 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 		tab.select();
 		mQueryCounter++;
 	}
-	
+
 	/**
 	 * Action: add a new query tab
 	 */
@@ -239,17 +243,35 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 		int selectedTabIndex = savedInstanceState.getInt("selectedTabIndex");
 		ArrayList<Parcelable> fragmentStates = savedInstanceState.getParcelableArrayList("fragmentStates");
 		ArrayList<String> tabTitles = savedInstanceState.getStringArrayList("tabTitles");
+		ArrayList<Integer> tabTypes = savedInstanceState.getIntegerArrayList("tabTypes");
 
 		if (tabTitles != null && fragmentStates != null)
 		{
 			for (int i = 0; i < tabTitles.size() && i < fragmentStates.size(); i++)
 			{
+				// Get the title
 				String tabTitle = tabTitles.get(i);
+
+				// Restore the right kind of fragment
+				Fragment fragment;
+				if (tabTypes.get(i) == TAB_TYPE_SCRIPT)
+				{
+					fragment = new ScriptFragment();
+				}
+				else
+				{
+					fragment = new QueryFragment();
+				}
+
+				// Restore the fragment's internal state
 				Fragment.SavedState fragmentState = (Fragment.SavedState)fragmentStates.get(i);
-				Fragment fragment = new QueryFragment();
 				fragment.setInitialSavedState(fragmentState);
+
+				// Restore the tab
 				add_fragment_tab(tabTitle, fragment);
 			}
+			
+			// If we had a selected tab, select it again
 			if (selectedTabIndex > -1)
 			{
 				getActionBar().setSelectedNavigationItem(selectedTabIndex);
@@ -275,6 +297,7 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 	private void save_tabs(Bundle savedInstanceState)
 	{
 		ArrayList<String> tabTitles = new ArrayList<String>();
+		ArrayList<Integer> tabTypes = new ArrayList<Integer>();
 		ArrayList<Parcelable> fragmentStates = new ArrayList<Parcelable>();
 
 		for (int i = 0; i < getActionBar().getTabCount(); i++)
@@ -284,6 +307,15 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 			String tabTitle = tab.getText().toString();
 			Fragment fragment = listener.getFragment();
 
+			if (fragment instanceof ScriptFragment)
+			{
+				tabTypes.add(TAB_TYPE_SCRIPT);
+			}
+			else
+			{
+				tabTypes.add(TAB_TYPE_QUERY);
+			}
+
 			Fragment.SavedState fragmentState = getFragmentManager().saveFragmentInstanceState(fragment);
 			tabTitles.add(tabTitle);
 			fragmentStates.add(fragmentState);
@@ -292,6 +324,7 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 		savedInstanceState.putInt("queryCounter", mQueryCounter);
 		savedInstanceState.putInt("selectedTabIndex", getActionBar().getSelectedNavigationIndex());
 		savedInstanceState.putStringArrayList("tabTitles", tabTitles);
+		savedInstanceState.putIntegerArrayList("tabTypes", tabTypes);
 		savedInstanceState.putParcelableArrayList("fragmentStates", fragmentStates);
 	}
 
