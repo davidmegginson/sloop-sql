@@ -1,10 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     
 	<item
-		android:id="@+id/item_share"
 		android:title="@string/label_share"
 		android:icon="@drawable/ic_share_dark"
-		android:showAsAction="ifRoom" />
+		android:showAsAction="ifRoom">
+		<menu>
+			<item
+				android:id="@+id/item_share_query"
+				android:title="@string/label_share_query" />
+			<item
+				android:id="@+id/item_share_csv"
+				android:title="@string/label_share_csv" />
+		</menu>
+	</item>
     
 	<item
         android:id="@+id/item_clear_history"

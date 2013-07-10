@@ -7,6 +7,8 @@
 	<string name="label_execute">Run query</string>
 	<string name="label_clear_history">Clear history</string>
 	<string name="label_share">Share</string>
+	<string name="label_share_query">Share query text</string>
+	<string name="label_share_csv">Share results as CSV</string>
 	<string name="message_history_cleared">History cleared</string>
 	<string name="title_table_list">Database tables</string>
 	<string name="label_add">Add</string>

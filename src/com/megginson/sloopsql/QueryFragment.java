@@ -214,8 +214,8 @@ public class QueryFragment extends Fragment
 			case R.id.item_clear_history:
 				do_clear_history();
 				return true;
-			case R.id.item_share:
-				do_share();
+			case R.id.item_share_csv:
+				do_share_csv();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -272,7 +272,7 @@ public class QueryFragment extends Fragment
 	 * Offers to share the current results as a text/csv file
 	 * named "sloopsql-results.csv".
 	 */
-	private void do_share()
+	private void do_share_csv()
 	{
 		try
 		{
