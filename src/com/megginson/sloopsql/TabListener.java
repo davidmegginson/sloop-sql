@@ -22,6 +22,10 @@ public class TabListener implements ActionBar.TabListener
 {
 
  	private final Fragment mFragment;
+	
+	private boolean mIsAdded = false;
+	
+	private final int mParentId;
 
 	/** 
 	 * Construct a new tab-content instance.
@@ -29,13 +33,10 @@ public class TabListener implements ActionBar.TabListener
 	 * @param activity  The host Activity, used to instantiate the fragment
 	 * @param fragmentClass  The fragment's Class, used to instantiate the fragment
 	 */
-	public TabListener(Activity activity, int parentId, Fragment fragment)
+	public TabListener(int parentId, Fragment fragment)
 	{
 		mFragment = fragment;
-		
-		// add and detach fragment immediately so that it's in the manager
-		activity.getFragmentManager().beginTransaction().replace(parentId, fragment).commit();
-		activity.getFragmentManager().beginTransaction().detach(fragment).commit();
+		mParentId = parentId;
 	}
 
 	/* The following are each of the ActionBar.TabListener callbacks */
@@ -43,7 +44,13 @@ public class TabListener implements ActionBar.TabListener
 	@Override
 	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
 	{
+		if (!mIsAdded)
+		{
+			ft.replace(mParentId, mFragment);
+			mIsAdded = true;
+		} else {
 			ft.attach(mFragment);
+			}
 	}
 
 	@Override

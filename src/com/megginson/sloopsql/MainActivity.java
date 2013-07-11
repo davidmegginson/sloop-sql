@@ -188,7 +188,7 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 		ActionBar.Tab tab = 
 			add_fragment_tab(title, ScriptFragment.newInstance(scriptText));
 		tab.select();
-		mQueryCounter++;
+		mScriptCounter++;
 	}
 
 	/**
@@ -240,6 +240,7 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 	{
 		((ViewGroup)findViewById(R.id.fragment_container)).removeAllViews();
 		mQueryCounter = savedInstanceState.getInt("queryCounter");
+		mScriptCounter = savedInstanceState.getInt("scriptCounter");
 		int selectedTabIndex = savedInstanceState.getInt("selectedTabIndex");
 		ArrayList<Parcelable> fragmentStates = savedInstanceState.getParcelableArrayList("fragmentStates");
 		ArrayList<String> tabTitles = savedInstanceState.getStringArrayList("tabTitles");
@@ -322,6 +323,7 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 		}
 
 		savedInstanceState.putInt("queryCounter", mQueryCounter);
+		savedInstanceState.putInt("scriptCounter", mScriptCounter);
 		savedInstanceState.putInt("selectedTabIndex", getActionBar().getSelectedNavigationIndex());
 		savedInstanceState.putStringArrayList("tabTitles", tabTitles);
 		savedInstanceState.putIntegerArrayList("tabTypes", tabTypes);
@@ -343,7 +345,7 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 	 */
 	private ActionBar.Tab add_fragment_tab(String label, Fragment fragment)
 	{
-		TabListener listener = new TabListener(this, R.id.fragment_container, fragment);
+		TabListener listener = new TabListener(R.id.fragment_container, fragment);
 		ActionBar.Tab tab = getActionBar().newTab()
 			.setText(label)
 			.setTabListener(listener);
