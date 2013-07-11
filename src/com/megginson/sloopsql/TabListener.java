@@ -34,7 +34,7 @@ public class TabListener implements ActionBar.TabListener
 		mFragment = fragment;
 		
 		// add and detach fragment immediately so that it's in the manager
-		activity.getFragmentManager().beginTransaction().add(parentId, fragment).commit();
+		activity.getFragmentManager().beginTransaction().replace(parentId, fragment).commit();
 		activity.getFragmentManager().beginTransaction().detach(fragment).commit();
 	}
 
