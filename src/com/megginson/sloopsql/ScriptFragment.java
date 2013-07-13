@@ -29,7 +29,7 @@ public class ScriptFragment extends Fragment
 	/**
 	 * Property name for saved SQL query.
 	 */
-	public final static String SCRIPT_TEXT_PROPERTY = "queryText";
+	public final static String SCRIPT_TEXT_PROPERTY = "scriptText";
 	
 	/**
 	 * Static constructor
