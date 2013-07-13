@@ -150,6 +150,12 @@ public class ScriptFragment extends Fragment
 			case R.id.item_execute_script:
 				do_execute_script();
 				return true;
+			case R.id.item_share:
+				do_share();
+				return true;
+			case R.id.item_save:
+				do_save();
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -179,6 +185,16 @@ public class ScriptFragment extends Fragment
 				return;
 			}
 		}
+	}
+	
+	private void do_share()
+	{
+		Util.toast(getActivity(), "Share");
+	}
+	
+	private void do_save()
+	{
+		Util.toast(getActivity(), "Save");
 	}
 
 	//
