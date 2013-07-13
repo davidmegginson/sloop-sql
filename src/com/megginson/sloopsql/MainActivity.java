@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.Menu;
@@ -13,7 +15,6 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import com.megginson.sloopsql.R;
 import java.util.ArrayList;
-import android.content.Intent;
 
 /**
  * Main container activity for the UI.
@@ -150,7 +151,7 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 			switch (requestCode)
 			{
 				case REQUEST_LOAD_SCRIPT:
-					do_load_script(data.getData().getPath());
+					do_load_script(data.getData());
 					break;
 				default:
 					super.onActivityResult(requestCode, resultCode, data);
@@ -254,14 +255,21 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 		intent.setType("file/*");
 		startActivityForResult(intent, REQUEST_LOAD_SCRIPT);
 	}
-	
+
 	/**
 	 * Given a path, load a script into a new tab.
 	 */
-	private void do_load_script(String path)
+	private void do_load_script(Uri source)
 	{
-		// TODO load the script in a new tab
-		Util.toast(this, path);
+		try
+		{
+			String contents = Util.readFile(source.getPath());
+			add_fragment_tab(source.getLastPathSegment(), ScriptFragment.newInstance(contents));
+		}
+		catch (Throwable t)
+		{
+			Util.toast(this, t.getMessage());
+		}
 	}
 
 

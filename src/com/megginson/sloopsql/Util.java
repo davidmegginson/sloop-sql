@@ -7,6 +7,10 @@ import android.content.Context;
 import android.widget.Toast;
 import java.util.List;
 import java.util.ArrayList;
+import java.io.IOException;
+import java.io.FileReader;
+import java.io.Reader;
+import java.io.BufferedReader;
 
 /**
  * Static utility methods for the application.
@@ -20,6 +24,29 @@ public final class Util
 	public static boolean isEmpty(String s)
 	{
 		return (s == null || s.length() == 0);
+	}
+	
+	/**
+	 * Read the contents of a file.
+	 */
+	public static String readFile(String path)
+	throws IOException
+	{
+		Reader input = null;
+		try {
+			StringBuffer contents = new StringBuffer();
+			input = new BufferedReader(new FileReader(path));
+			int c = input.read();
+			while (c != -1) {
+				contents.append((char)c);
+				c = input.read();
+			}
+			return contents.toString();
+		} finally {
+			if (input != null) {
+				input.close();
+			}
+		}
 	}
 
 	/**
