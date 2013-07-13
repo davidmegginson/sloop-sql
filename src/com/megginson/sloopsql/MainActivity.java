@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import com.megginson.sloopsql.R;
 import java.util.ArrayList;
+import android.content.Intent;
 
 /**
  * Main container activity for the UI.
@@ -25,6 +26,8 @@ public class MainActivity extends Activity implements TableListFragment.Listener
  	public final static int TAB_TYPE_QUERY = 1;
 
 	public final static int TAB_TYPE_SCRIPT = 2;
+
+	public final static int REQUEST_LOAD_SCRIPT = 10;
 
 	//
 	// Internal state
@@ -57,15 +60,6 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 
 		// Specify that tabs should be displayed in the action bar.
 		getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-	}
-
-	/**
-	 * Lifecycle event: activity finally destroyed.
-	 */
-	@Override
-	protected void onDestroy()
-	{
-		super.onDestroy();
 	}
 
 	/**
@@ -138,8 +132,34 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 			case R.id.item_list_tables:
 				do_list_tables();
 				return true;
+			case R.id.item_load_script:
+				do_request_load_script();
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	/**
+	 * Lifecycle event: result from a child activity.
+	 */
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		if (resultCode == RESULT_OK)
+		{
+			switch (requestCode)
+			{
+				case REQUEST_LOAD_SCRIPT:
+					do_load_script(data.getData().getPath());
+					break;
+				default:
+					super.onActivityResult(requestCode, resultCode, data);
+					break;
+			}
+		}
+		else
+		{
+			Util.toast(this, R.string.message_cancelled);
 		}
 	}
 
@@ -222,6 +242,28 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 		newFragment.show(ft, "dialog");
 	}
 
+	/**
+	 * Send out an intent requesting an activity to pick a script file.
+	 *
+	 * The {@link #onActivityResult(int, int, Intent)} method will receive
+	 * the result.
+	 */
+	private void do_request_load_script()
+	{
+		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+		intent.setType("file/*");
+		startActivityForResult(intent, REQUEST_LOAD_SCRIPT);
+	}
+	
+	/**
+	 * Given a path, load a script into a new tab.
+	 */
+	private void do_load_script(String path)
+	{
+		// TODO load the script in a new tab
+		Util.toast(this, path);
+	}
+
 
 	//
 	// Internal utility methods
@@ -271,7 +313,7 @@ public class MainActivity extends Activity implements TableListFragment.Listener
 				// Restore the tab
 				add_fragment_tab(tabTitle, fragment);
 			}
-			
+
 			// If we had a selected tab, select it again
 			if (selectedTabIndex > -1)
 			{

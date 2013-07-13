@@ -30,8 +30,7 @@ public class ScriptFragment extends Fragment
 	 * Property name for saved SQL query.
 	 */
 	public final static String SCRIPT_TEXT_PROPERTY = "queryText";
-
-
+	
 	/**
 	 * Static constructor
 	 */
@@ -153,6 +152,8 @@ public class ScriptFragment extends Fragment
 				return super.onOptionsItemSelected(item);
 		}
 	}
+	
+	
 
 
 	//
@@ -201,7 +202,7 @@ public class ScriptFragment extends Fragment
 			startActivity(sendIntent);
 		}
 	}
-
+	
 	private void do_save()
 	{
 		Util.toast(getActivity(), "Save");

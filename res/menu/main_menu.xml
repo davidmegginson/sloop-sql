@@ -26,4 +26,8 @@
 		android:icon="@android:drawable/ic_delete"
 		android:showAsAction="ifRoom" />
 	
+	<item
+		android:id="@+id/item_load_script"
+		android:title="@string/label_load_script" />
+	
 </menu>

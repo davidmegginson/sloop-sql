@@ -11,6 +11,7 @@
 	<string name="label_share_csv">Share results as CSV</string>
 	<string name="message_history_cleared">History cleared</string>
 	<string name="message_no_share">Nothing to share</string>
+	<string name="message_cancelled">Cancelled</string>
 	<string name="title_table_list">Database tables</string>
 	<string name="label_add">Add</string>
 	<string name="label_add_query">New query</string>
@@ -18,5 +19,6 @@
 	<string name="label_execute_script">Execute script</string>
 	<string name="label_close_tab">Close tab</string>
 	<string name="label_list_tables">List tables</string>
+	<string name="label_load_script">Load SQL script</string>
 	<string name="label_save">Save</string>
 </resources>
