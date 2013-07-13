@@ -13,6 +13,14 @@ import java.util.ArrayList;
  */
 public final class Util
 {
+ 
+ 	/**
+	 * Check for a null or empty string.
+	 */
+	public static boolean isEmpty(String s)
+	{
+		return (s == null || s.length() == 0);
+	}
 
 	/**
 	 * Inflate a layout.
@@ -37,6 +45,17 @@ public final class Util
 	public static void toast(Context context, String message)
 	{
 		Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+	}
+	
+	/**
+	 * Show a long toast pop-up message.
+	 *
+	 * @param context The context (e.g. activity) in which to show the toast.
+	 * @param messageId The id of a localised string message to show.
+	 */
+	public static void toast(Context context, int messageId)
+	{
+		Toast.makeText(context, messageId, Toast.LENGTH_LONG).show();
 	}
 
 	/**

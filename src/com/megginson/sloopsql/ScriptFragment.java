@@ -1,27 +1,20 @@
 package com.megginson.sloopsql;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import com.megginson.sloopsql.R;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Activity for executing SQL queries.
@@ -186,12 +179,29 @@ public class ScriptFragment extends Fragment
 			}
 		}
 	}
-	
+
+	/**
+	 * Action: offer to share the current SQL script.
+	 *
+	 * Shares as text/plain for now.  Doesn't provide a filename.
+	 */
 	private void do_share()
 	{
-		Util.toast(getActivity(), "Share");
+		mScriptText = get_script_view().getText().toString();
+		if (Util.isEmpty(mScriptText))
+		{
+			Util.toast(getActivity(), R.string.message_no_share);
+		}
+		else
+		{
+			Intent sendIntent = new Intent();
+			sendIntent.setAction(Intent.ACTION_SEND);
+			sendIntent.putExtra(Intent.EXTRA_TEXT, mScriptText);
+			sendIntent.setType("text/plain");
+			startActivity(sendIntent);
+		}
 	}
-	
+
 	private void do_save()
 	{
 		Util.toast(getActivity(), "Save");

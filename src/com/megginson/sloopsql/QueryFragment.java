@@ -48,8 +48,8 @@ public class QueryFragment extends Fragment
 	 * Property name for saved SQL query.
 	 */
 	public final static String QUERY_TEXT_PROPERTY = "queryText";
-	
-	
+
+
 	/**
 	 * Static constructor
 	 */
@@ -108,7 +108,7 @@ public class QueryFragment extends Fragment
 		{
 			mQueryText = savedInstanceState.getString(QUERY_TEXT_PROPERTY);
 		}
-		
+
 		mDatabase = new DatabaseHandler(getActivity()).getReadableDatabase();
     }
 
@@ -214,6 +214,9 @@ public class QueryFragment extends Fragment
 			case R.id.item_clear_history:
 				do_clear_history();
 				return true;
+			case R.id.item_share_query:
+				do_share_query();
+				return true;
 			case R.id.item_share_csv:
 				do_share_csv();
 				return true;
@@ -264,6 +267,28 @@ public class QueryFragment extends Fragment
 		mQueryHistory = new HashSet<String>();
 		update_query_history(null);
 		Util.toast(getActivity(), getString(R.string.message_history_cleared));
+	}
+	
+	/**
+	 * Action: offer to share the current SQL query.
+	 *
+	 * Shares as text/plain for now.  Doesn't provide a filename.
+	 */
+	private void do_share_query()
+	{
+		mQueryText = get_query_view().getText().toString();
+		if (Util.isEmpty(mQueryText))
+		{
+			Util.toast(getActivity(), R.string.message_no_share);
+		}
+		else
+		{
+			Intent sendIntent = new Intent();
+			sendIntent.setAction(Intent.ACTION_SEND);
+			sendIntent.putExtra(Intent.EXTRA_TEXT, mQueryText);
+			sendIntent.setType("text/plain");
+			startActivity(sendIntent);
+		}
 	}
 
 	/**
